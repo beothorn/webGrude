@@ -1,5 +1,8 @@
 package webToJava;
 
+import static webToJava.elements.Instantiator.instanceForNode;
+import static webToJava.elements.Instantiator.typeIsKnown;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -37,9 +40,8 @@ public class Browser {
 		final Iterator<Element> iterator = nodes.iterator();
 		while (iterator.hasNext()) {
 			final Element node = iterator.next();
-			if(classs.equals(String.class)){//change to visitor
-				final String textContent = node.text();
-				newInstanceList.add((T) textContent);
+			if(typeIsKnown(classs)){
+				newInstanceList.add((T) instanceForNode(node,classs));
 			}else{
 				newInstanceList.add(loadDomContents(node, classs));
 			}
@@ -75,9 +77,12 @@ public class Browser {
 					f.set(newInstance, populate(nodes, listClass));
 				}else{
 					final Element first = node.select(f.getAnnotation(Selector.class).value()).first();
-					if(fieldClass.equals(String.class)){//change to visitor						
-						final String textContent = first.text();
-						f.set(newInstance, textContent);
+					if(typeIsKnown(fieldClass)){
+						f.set(newInstance, instanceForNode(first,fieldClass));
+					}else{
+						throw new RuntimeException(
+								"Can't convert html to class "+fieldClass.getName()+"\n"
+								+ "The Selector annotation should be on the class file, not on the field.");
 					}
 				}
 			}
