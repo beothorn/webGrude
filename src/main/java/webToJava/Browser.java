@@ -34,14 +34,24 @@ public class Browser {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
+	private static <T> T internalLoad(final Class<T> annotatedClass) throws ClientProtocolException, IOException, InstantiationException, IllegalAccessException{
+		
+		if (!annotatedClass.isAnnotationPresent(PageURL.class)) throw new RuntimeException("Ops, you forgot to add the @"+PageURL.class.getSimpleName());
+		
+		final String pageUrl = annotatedClass.getAnnotation(PageURL.class).value();
+		final String page = webClient.get(pageUrl);	
+		final Document parse = Jsoup.parse(page);
+		
+		return loadDomContents(parse, annotatedClass);
+	}
+
 	private static <T> List<T> populate(final Elements nodes, final Class<T> classs) throws InstantiationException, IllegalAccessException{
 		final ArrayList<T> newInstanceList = new ArrayList<T>();
 		final Iterator<Element> iterator = nodes.iterator();
 		while (iterator.hasNext()) {
 			final Element node = iterator.next();
 			if(typeIsKnown(classs)){
-				newInstanceList.add((T) instanceForNode(node,classs));
+				newInstanceList.add(instanceForNode(node,classs));
 			}else{
 				newInstanceList.add(loadDomContents(node, classs));
 			}
@@ -93,17 +103,6 @@ public class Browser {
 			
 		}
 		return newInstance;
-	}
-	
-	private static <T> T internalLoad(final Class<T> annotatedClass) throws ClientProtocolException, IOException, InstantiationException, IllegalAccessException{
-		
-		if (!annotatedClass.isAnnotationPresent(PageURL.class)) throw new RuntimeException("Ops, you forgot to add the @"+PageURL.class.getSimpleName());
-		
-		final String pageUrl = annotatedClass.getAnnotation(PageURL.class).value();
-		final String page = webClient.get(pageUrl);	
-		final Document parse = Jsoup.parse(page);
-		
-		return loadDomContents(parse, annotatedClass);
 	}
 	
 }

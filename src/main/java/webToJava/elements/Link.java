@@ -1,6 +1,6 @@
 package webToJava.elements;
 
-public class Link {
+public class Link<T> {
 
 	public String href;
 
