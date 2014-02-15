@@ -28,8 +28,10 @@ Page foo.com:
 </body>
 </html>
 ```
-Pojo:
+Java Code:
 ```java
+
+import static webGrude.Browser.open;
 
 import java.util.List;
 
@@ -45,11 +47,25 @@ public class Foo {
 	}
 
 	@Selector("#section") static public class Section {
-		@Selector(".some-repeating-content") public List<String> someContent;
+		@Selector(".some-repeating-content") public List<String> someRepeatingContent;
 	}
 	
 	@Selector("p a") public Link<Foo> nextPage;
 	public SomeContent someContent;
 	public Section section;
+	
+	public static void main(final String[] args) {
+		final Foo foo = open(Foo.class);
+		
+		System.out.println(foo.someContent.title);
+		System.out.println(foo.someContent.text);
+		
+		for (final String content : foo.section.someRepeatingContent) {
+			System.out.println(content);
+		}
+		
+		Foo nextPage = foo.nextPage.visit();
+
+	}
 }
 ```
