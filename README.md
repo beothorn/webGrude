@@ -14,10 +14,10 @@ Page foo.com:
 	</div>
   
 	<div class="section">
-		<span class"some-repeating-content">
+		<span class="some-repeating-content">
 			bar baz
 		</span>
-		<span class"some-repeating-content">
+		<span class="some-repeating-content">
 			bar2 baz2
 		</span>
 	</div>
