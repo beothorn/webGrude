@@ -1,4 +1,4 @@
-package webToJava.elements;
+package webGrude.elements;
 
 import org.jsoup.nodes.Element;
 

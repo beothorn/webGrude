@@ -1,7 +1,7 @@
-package webToJava;
+package webGrude;
 
-import static webToJava.elements.Instantiator.instanceForNode;
-import static webToJava.elements.Instantiator.typeIsKnown;
+import static webGrude.elements.Instantiator.instanceForNode;
+import static webGrude.elements.Instantiator.typeIsKnown;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -17,10 +17,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import webToJava.annotations.PageURL;
-import webToJava.annotations.Selector;
-import webToJava.http.SimpleHttpClient;
-import webToJava.http.SimpleHttpClientImpl;
+import webGrude.annotations.PageURL;
+import webGrude.annotations.Selector;
+import webGrude.http.SimpleHttpClient;
+import webGrude.http.SimpleHttpClientImpl;
 
 public class Browser {
 	

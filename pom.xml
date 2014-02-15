@@ -1,7 +1,7 @@
 <project>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.beothorn</groupId>
-	<artifactId>webToJava</artifactId>
+	<artifactId>webGrude</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<dependencies>
 		<dependency>
