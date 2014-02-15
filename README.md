@@ -35,7 +35,6 @@ import java.util.List;
 
 import webGrude.annotations.PageURL;
 import webGrude.annotations.Selector;
-import webGrude.elements.HTML;
 import webGrude.elements.Link;
 
 @PageURL("http://foo.com/")
