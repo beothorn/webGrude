@@ -23,7 +23,7 @@ Page foo.com:
 	</div>
 	
 	<p>
-		<a href="">a link to another page</a>
+		<a href="">link to next page</a>
 	</p>
 </body>
 </html>
