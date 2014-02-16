@@ -3,6 +3,8 @@ package webGrude.elements;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.text.html.HTML;
+
 import org.jsoup.nodes.Element;
 
 @SuppressWarnings("rawtypes")
@@ -21,8 +23,8 @@ public class Instantiator {
 	
 	@SuppressWarnings("unchecked")
 	public static <T> T instanceForNode(final Element node, final Class<T> c){
-		if(c.equals(HTML.class))
-			return (T) new HTML(node);
+		if(c.equals(Element.class))
+			return (T) node;
 		return (T) node.text();
 	}
 }
