@@ -13,7 +13,7 @@
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			<version>4.2-alpha1</version>
+			<version>4.3.2</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -23,7 +23,7 @@
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
-			<version>1.6.2</version>
+			<version>1.7.3</version>
 		</dependency>
 	</dependencies>
 </project>
