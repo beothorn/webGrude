@@ -1,8 +1,8 @@
-webGrude
+WebGrude
 =========
 
 WebGrude is a java library for Web scraping.  
-It uses annotations to map a page to a pojo.  
+It uses annotations to map a page to a pojo using jsoup and httpComponents.   
 Example:  
 Page foo.com:
 ```html
