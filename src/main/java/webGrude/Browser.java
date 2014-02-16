@@ -20,8 +20,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import webGrude.annotations.Link;
 import webGrude.annotations.Page;
 import webGrude.annotations.Selector;
+import webGrude.elements.Instantiator;
+import webGrude.elements.Visitable;
 import webGrude.http.SimpleHttpClient;
 import webGrude.http.SimpleHttpClientImpl;
 
@@ -119,12 +122,23 @@ public class Browser {
 	}
 
 	private static <T> void solveAnnotatedFieldWithMappableType(final Element node, final T newInstance, final Field f, final Class<?> fieldClass) throws IllegalAccessException {
-		final String cssQuery = f.getAnnotation(Selector.class).value();
+		final Selector selectorAnnotation = f.getAnnotation(Selector.class);
+		final String cssQuery = selectorAnnotation.value();
 		final Element selectedNode = getOnlyOneOrCry(node, cssQuery);
-		if (typeIsKnown(fieldClass)) {
-			f.set(newInstance, instanceForNode(selectedNode, fieldClass));
-		} else {
-			throw new RuntimeException("Can't convert html to class " + fieldClass.getName() + "\n" + "The Selector annotation should be on the class file, not on the field.");
+		
+		final Link linkAnnotation = f.getAnnotation(Link.class);
+		if(linkAnnotation!=null){
+			if (Instantiator.typeIsVisitable(fieldClass)) {
+				f.set(newInstance, Instantiator.visitableForNode(selectedNode, linkAnnotation.value()));
+			} else {
+				throw new RuntimeException("If the annotatio " + Link.class.getSimpleName() + " is used the field must be a " + Visitable.class.getName());
+			}
+		}else{			
+			if (typeIsKnown(fieldClass)) {
+				f.set(newInstance, instanceForNode(selectedNode, fieldClass));
+			} else {
+				throw new RuntimeException("Can't convert html to class " + fieldClass.getName() + "\n" + "The Selector annotation should be on the class file, not on the field.");
+			}
 		}
 	}
 

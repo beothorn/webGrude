@@ -3,7 +3,10 @@ WebGrude
 
 WebGrude is a java library for Web scraping.  
 It uses annotations to map a page to a pojo with jsoup and httpComponents.   
-Example:  
+
+Example
+=========
+
 Page foo.com:
 ```html
 <html>
@@ -26,16 +29,14 @@ Page foo.com:
 		</div>
 	</div>
 	
-	<p>
-		<a href="">link to next page</a>
-	</p>
-	
 	<div id="html-content">
 		<p>
 			Get content as <br> 
 			element
 		</p>
 	</div>
+	
+	<a href="nextPage.html" class="next"> next </a>
 </body>
 </html>
 ```
@@ -68,7 +69,7 @@ public class Foo {
 	}
 	
 	@Selector("#html-content") public Element htmlContent;
-	@Selector("p a") public Link<Foo> nextPage;
+	@Selector(".next") @Link(Foo.class) public Visitable<Foo> nextPage;
 	
 	public SomeContent someContent;
 	public SomeNestedContent someNestedContent;
