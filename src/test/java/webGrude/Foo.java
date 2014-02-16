@@ -1,46 +1,4 @@
-WebGrude
-=========
-
-WebGrude is a java library for Web scraping.  
-It uses annotations to map a page to a pojo with jsoup and httpComponents.   
-Example:  
-Page foo.com:
-```html
-<html>
-<body>
-	<div id="some-content">
-		<h1>Title</h1>
-		<div>Lorem ipsum</div>
-	</div>
-  
-	<div id="section">
-		<span class="some-repeating-content">
-			bar baz
-		</span>
-		<span class="some-repeating-content">
-			bar2 baz2
-		</span>
-		<div id="some-nested-content">
-			<h1>Nested content Title</h1>
-			<span>Nested content</span>
-		</div>
-	</div>
-	
-	<p>
-		<a href="">link to next page</a>
-	</p>
-	
-	<div id="html-content">
-		<p>
-			Get content as <br> 
-			element
-		</p>
-	</div>
-</body>
-</html>
-```
-Java Code:
-```java
+package webGrude;
 
 import java.util.List;
 
@@ -75,5 +33,3 @@ public class Foo {
 	public Section section;
 
 }
-
-```
