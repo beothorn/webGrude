@@ -51,7 +51,7 @@ import webGrude.annotations.Page;
 import webGrude.annotations.Selector;
 import webGrude.elements.Link;
 
-@Page
+@Page("http://www.foo.com.br")
 public class Foo {
 	@Selector("#some-content") static public class SomeContent {
 		@Selector("h1") public String title;
@@ -69,12 +69,26 @@ public class Foo {
 	}
 	
 	@Selector("#html-content") public Element htmlContent;
-	@Selector(".next") @Link(Foo.class) public Visitable<Foo> nextPage;
+	@Selector(".next") public Link<Foo> nextPage;
 	
 	public SomeContent someContent;
 	public SomeNestedContent someNestedContent;
 	public Section section;
-
+	
+	public static void main(final String[] args) {
+		Foo foo = Browser.open(Foo.class);
+		System.out.println(foo.someContent.title);
+		System.out.println(foo.someContent.text);
+		
+		System.out.println(foo.someNestedContent.header);
+		System.out.println(foo.someNestedContent.content);
+		
+		System.out.println(foo.section.someRepeatingContent.get(0));
+		System.out.println(foo.section.someRepeatingContent.get(1));
+		
+		System.out.println(foo.htmlContent.html());
+		foo = foo.nextPage.visit();//Follow link
+	}
 }
 
 ```

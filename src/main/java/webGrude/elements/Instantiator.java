@@ -12,7 +12,7 @@ public class Instantiator {
 	static {
 		classes = new ArrayList<Class>();
 		classes.add(String.class);
-		classes.add(Visitable.class);
+		classes.add(Link.class);
 		classes.add(Element.class);
 	}
 	
@@ -28,11 +28,11 @@ public class Instantiator {
 	}
 
 	public static boolean typeIsVisitable(final Class<?> fieldClass) {
-		return fieldClass.equals(Visitable.class);
+		return fieldClass.equals(Link.class);
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> T visitableForNode(final Element node, final Class c) {
-		return (T) new Visitable<T>(node, c);
+	public static <T> T visitableForNode(final Element node, final Class c, final String currentPageUrl) {
+		return (T) new Link<T>(node, c, currentPageUrl);
 	}
 }

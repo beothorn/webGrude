@@ -6,7 +6,7 @@ import org.jsoup.nodes.Element;
 
 import webGrude.annotations.Page;
 import webGrude.annotations.Selector;
-import webGrude.elements.Visitable;
+import webGrude.elements.Link;
 
 @Page
 public class Foo {
@@ -26,7 +26,7 @@ public class Foo {
 	}
 	
 	@Selector("#html-content") public Element htmlContent;
-	@Selector("p a") public Visitable<Foo> nextPage;
+	@Selector("p a") public Link<Foo> nextPage;
 	
 	public SomeContent someContent;
 	public SomeNestedContent someNestedContent;

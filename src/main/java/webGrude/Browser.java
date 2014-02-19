@@ -20,17 +20,19 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import webGrude.annotations.Link;
 import webGrude.annotations.Page;
 import webGrude.annotations.Selector;
 import webGrude.elements.Instantiator;
-import webGrude.elements.Visitable;
+import webGrude.elements.Link;
 import webGrude.http.SimpleHttpClient;
 import webGrude.http.SimpleHttpClientImpl;
+
+import com.google.common.reflect.TypeToken;
 
 public class Browser {
 
 	private static final SimpleHttpClient webClient = new SimpleHttpClientImpl();
+	private static String currentPageUrl;
 
 	public static <T> T open(final Class<T> pageClass) {
 		cryIfNotAnnotated(pageClass);
@@ -57,6 +59,7 @@ public class Browser {
 	}
 
 	private static <T> T loadPage(final String pageUrl, final Class<T> pageClass) throws MalformedURLException, IOException, ClientProtocolException, InstantiationException, IllegalAccessException {
+		Browser.currentPageUrl = pageUrl;
 		final URL url = new URL(pageUrl);
 		final String protocol = url.getProtocol();
 		final Document parse;
@@ -126,13 +129,9 @@ public class Browser {
 		final String cssQuery = selectorAnnotation.value();
 		final Element selectedNode = getOnlyOneOrCry(node, cssQuery);
 		
-		final Link linkAnnotation = f.getAnnotation(Link.class);
-		if(linkAnnotation!=null){
-			if (Instantiator.typeIsVisitable(fieldClass)) {
-				f.set(newInstance, Instantiator.visitableForNode(selectedNode, linkAnnotation.value()));
-			} else {
-				throw new RuntimeException("If the annotatio " + Link.class.getSimpleName() + " is used the field must be a " + Visitable.class.getName());
-			}
+		if (Instantiator.typeIsVisitable(fieldClass)) {
+			final Class<?> visitableGenericClass = TypeToken.of(f.getGenericType()).resolveType(Link.class.getTypeParameters()[0]).getRawType();
+			f.set(newInstance, Instantiator.visitableForNode(selectedNode, visitableGenericClass, Browser.currentPageUrl));
 		}else{			
 			if (typeIsKnown(fieldClass)) {
 				f.set(newInstance, instanceForNode(selectedNode, fieldClass));
@@ -154,8 +153,10 @@ public class Browser {
 		final Type genericType = f.getGenericType();
 		final Class<?> listClass = (Class<?>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
 
-		if (listClass.getAnnotation(Selector.class) != null) {
-			final Elements nodes = node.select(listClass.getAnnotation(Selector.class).value());
+		final Selector selectorAnnotation = listClass.getAnnotation(Selector.class);
+		if (selectorAnnotation != null) {
+			final String cssQuery = selectorAnnotation.value();
+			final Elements nodes = node.select(cssQuery);
 			f.set(newInstance, populate(nodes, listClass));
 		}
 	}
