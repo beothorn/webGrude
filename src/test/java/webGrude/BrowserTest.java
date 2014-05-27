@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-public class BrowserTest { 
-	
+public class BrowserTest {
+
 	@Test
 	public void test(){
 		
@@ -23,7 +23,9 @@ public class BrowserTest {
 		assertEquals("bar2 baz2",foo.section.someRepeatingContent.get(1));
 		
 		assertEquals("<p> Get content as <br /> element </p>",foo.htmlContent.html());
-		
+
+        assertEquals("linkToBeExtracted1",foo.linksWithHref.get(0));
+        assertEquals("linkToBeExtracted2",foo.linksWithHref.get(1));
 	}
 	
 }

@@ -19,13 +19,15 @@ public class Instantiator {
 	public static boolean typeIsKnown(final Class c){
 		return classes.contains(c);
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public static <T> T instanceForNode(final Element node, final Class<T> c){
-		if(c.equals(Element.class))
-			return (T) node;
-		return (T) node.text();
-	}
+    public static <T> T instanceForNode(final Element node, String attribute, final Class<T> c){
+        if(c.equals(Element.class))
+            return (T) node;
+        if(attribute != null && !attribute.isEmpty())
+            return (T) node.attr(attribute);
+        return (T) node.text();
+    }
 
 	public static boolean typeIsVisitable(final Class<?> fieldClass) {
 		return fieldClass.equals(Link.class);

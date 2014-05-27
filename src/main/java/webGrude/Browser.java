@@ -110,7 +110,7 @@ public class Browser {
 		final Elements elements = node.select(cssQuery);
 		final int size = elements.size();
 		if(size != 1){
-			throw new RuntimeException("The query '"+cssQuery+"' should return one result but returned "+size);
+			throw new RuntimeException("The query '"+cssQuery+"' should return one result but returned "+size+". For more than one result a list should be used as the field type.");
 		}
 		final Element selectedNode = elements.first();
 		return selectedNode;
@@ -128,13 +128,14 @@ public class Browser {
 		final Selector selectorAnnotation = f.getAnnotation(Selector.class);
 		final String cssQuery = selectorAnnotation.value();
 		final Element selectedNode = getOnlyOneOrCry(node, cssQuery);
-		
-		if (Instantiator.typeIsVisitable(fieldClass)) {
-			final Class<?> visitableGenericClass = TypeToken.of(f.getGenericType()).resolveType(Link.class.getTypeParameters()[0]).getRawType();
-			f.set(newInstance, Instantiator.visitableForNode(selectedNode, visitableGenericClass, Browser.currentPageUrl));
-		}else{			
-			if (typeIsKnown(fieldClass)) {
-				f.set(newInstance, instanceForNode(selectedNode, fieldClass));
+
+        if (Instantiator.typeIsVisitable(fieldClass)) {
+            final Class<?> visitableGenericClass = TypeToken.of(f.getGenericType()).resolveType(Link.class.getTypeParameters()[0]).getRawType();
+            f.set(newInstance, Instantiator.visitableForNode(selectedNode, visitableGenericClass, Browser.currentPageUrl));
+        }else{
+            if (typeIsKnown(fieldClass)) {
+                final String attribute = selectorAnnotation.attr();
+                f.set(newInstance, instanceForNode(selectedNode, attribute, fieldClass));
 			} else {
 				throw new RuntimeException("Can't convert html to class " + fieldClass.getName() + "\n" + "The Selector annotation should be on the class file, not on the field.");
 			}
@@ -145,8 +146,9 @@ public class Browser {
 		final Type genericType = f.getGenericType();
 		final Class<?> listClass = (Class<?>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
 		final String cssQuery = f.getAnnotation(Selector.class).value();
+        final String attribute = f.getAnnotation(Selector.class).attr();
 		final Elements nodes = node.select(cssQuery);
-		f.set(newInstance, populate(nodes, listClass));
+		f.set(newInstance, populate(nodes,attribute, listClass));
 	}
 
 	private static <T> void solveListOfAnnotatedType(final Element node, final T newInstance, final Field f) throws IllegalAccessException, InstantiationException {
@@ -156,18 +158,19 @@ public class Browser {
 		final Selector selectorAnnotation = listClass.getAnnotation(Selector.class);
 		if (selectorAnnotation != null) {
 			final String cssQuery = selectorAnnotation.value();
+            final String attribute = selectorAnnotation.attr();
 			final Elements nodes = node.select(cssQuery);
-			f.set(newInstance, populate(nodes, listClass));
+			f.set(newInstance, populate(nodes,attribute, listClass));
 		}
 	}
 
-	private static <T> List<T> populate(final Elements nodes, final Class<T> classs) throws InstantiationException, IllegalAccessException {
+	private static <T> List<T> populate(final Elements nodes,String attribute, final Class<T> classs) throws InstantiationException, IllegalAccessException {
 		final ArrayList<T> newInstanceList = new ArrayList<T>();
 		final Iterator<Element> iterator = nodes.iterator();
 		while (iterator.hasNext()) {
 			final Element node = iterator.next();
 			if (typeIsKnown(classs)) {
-				newInstanceList.add(instanceForNode(node, classs));
+				newInstanceList.add(instanceForNode(node,attribute, classs));
 			} else {
 				newInstanceList.add(loadDomContents(node, classs));
 			}

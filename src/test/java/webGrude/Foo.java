@@ -27,6 +27,7 @@ public class Foo {
 	
 	@Selector("#html-content") public Element htmlContent;
 	@Selector("p a") public Link<Foo> nextPage;
+    @Selector(value = "#links a",attr = "href") public List<String> linksWithHref;
 	
 	public SomeContent someContent;
 	public SomeNestedContent someNestedContent;
