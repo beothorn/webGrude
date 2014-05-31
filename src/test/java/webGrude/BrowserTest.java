@@ -2,7 +2,13 @@ package webGrude;
 
 import static org.junit.Assert.assertEquals;
 
+import org.apache.http.client.ClientProtocolException;
 import org.junit.Test;
+import webGrude.http.SimpleHttpClient;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
 
 public class BrowserTest {
 
@@ -27,5 +33,21 @@ public class BrowserTest {
         assertEquals("linkToBeExtracted1",foo.linksWithHref.get(0));
         assertEquals("linkToBeExtracted2",foo.linksWithHref.get(1));
 	}
+
+    @Test
+    public void testUrlSubstitution(){
+
+        final String fooUrl = Foo.class.getResource("Foo.html").toString();
+        Browser.setWebClient(new SimpleHttpClient(){
+            @Override public String getToFile(String link, File destFile) throws ClientProtocolException, IOException {return "DUMMY";}
+            @Override public String getOrNull(String url) {return "DUMMY";}
+            @Override public String post(String postUrl, Map<String, String> params) throws ClientProtocolException, IOException {return "DUMMY";}
+            @Override public String post(String postUrl, String params) throws ClientProtocolException, IOException {return "DUMMY";}
+            @Override public String get(String get) throws ClientProtocolException, IOException {return "DUMMY";}
+            @Override public void close() {}
+        });
+        final PageWithParameterizedURL foo = Browser.open(PageWithParameterizedURL.class,"x","y");
+        assertEquals("http://www.foo.com/x/bar/y/baz",Browser.getCurentUrl());
+    }
 	
 }

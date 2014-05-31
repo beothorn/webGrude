@@ -10,6 +10,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,23 +32,31 @@ import com.google.common.reflect.TypeToken;
 
 public class Browser {
 
-	private static final SimpleHttpClient webClient = new SimpleHttpClientImpl();
-	private static String currentPageUrl;
+    private static SimpleHttpClient webClient;
+    private static String currentPageUrl;
 
-	public static <T> T open(final Class<T> pageClass) {
+	public static <T> T open(final Class<T> pageClass,final String... params) {
 		cryIfNotAnnotated(pageClass);
 		try {
 			final String pageUrl = pageClass.getAnnotation(Page.class).value();
-			return loadPage(pageUrl, pageClass);
+			return loadPage(pageUrl, pageClass, params);
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public static <T> T open(final String pageUrl, final Class<T> pageClass) {
+    public static String getCurentUrl() {
+        return currentPageUrl;
+    }
+
+    public static void setWebClient(final SimpleHttpClient client) {
+        webClient = client;
+    }
+
+    public static <T> T open(final String pageUrl, final Class<T> pageClass, final String... params) {
 		cryIfNotAnnotated(pageClass);
 		try {
-			return loadPage(pageUrl, pageClass);
+			return loadPage(pageUrl, pageClass, params);
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -58,23 +67,39 @@ public class Browser {
 			throw new RuntimeException("Ops, you forgot to add the @" + Page.class.getSimpleName());
 	}
 
-	private static <T> T loadPage(final String pageUrl, final Class<T> pageClass) throws MalformedURLException, IOException, ClientProtocolException, InstantiationException, IllegalAccessException {
-		Browser.currentPageUrl = pageUrl;
-		final URL url = new URL(pageUrl);
+    private static String loadPage(String pageUrl, final String... params){
+        if(webClient == null)
+            setWebClient(new SimpleHttpClientImpl());
+        try {
+            return webClient.get(pageUrl);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+	private static <T> T loadPage(final String pageUrl, final Class<T> pageClass, final String... params) throws MalformedURLException, IOException, ClientProtocolException,  IllegalAccessException {
+        Browser.currentPageUrl = MessageFormat.format(pageUrl, params);;
+
+		final URL url = new URL(Browser.currentPageUrl);
 		final String protocol = url.getProtocol();
 		final Document parse;
 		if (protocol.equals("file")) {
 			parse = Jsoup.parse(new File(url.getPath()), "UTF-8");
 		} else {
-			final String page = webClient.get(pageUrl);
+			final String page = loadPage(Browser.currentPageUrl);
 			parse = Jsoup.parse(page);
 		}
 
-		return loadDomContents(parse, pageClass);
+        try {
+		    return loadDomContents(parse, pageClass);
+        }catch(InstantiationException e){
+            throw new RuntimeException("Maybe you forgot to write your internal class as 'public static'?", e);
+        }
 	}
 
-	private static <T> T loadDomContents(final Element node, final Class<T> classs) throws InstantiationException, IllegalAccessException {
-		final T newInstance = classs.newInstance();
+	private static <T> T loadDomContents(final Element node, final Class<T> classs) throws IllegalAccessException, InstantiationException {
+
+        final T newInstance = classs.newInstance();
 
 		if (classs.getAnnotation(Selector.class) == null && classs.getAnnotation(Page.class) == null)
 			return newInstance;
