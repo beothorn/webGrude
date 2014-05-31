@@ -4,10 +4,16 @@ import static org.junit.Assert.assertEquals;
 
 import org.apache.http.client.ClientProtocolException;
 import org.junit.Test;
+import webGrude.annotations.Page;
+import webGrude.annotations.Selector;
+import webGrude.elements.Link;
 import webGrude.http.SimpleHttpClient;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.List;
 import java.util.Map;
 
 public class BrowserTest {
@@ -32,6 +38,12 @@ public class BrowserTest {
 
         assertEquals("linkToBeExtracted1",foo.linksWithHref.get(0));
         assertEquals("linkToBeExtracted2",foo.linksWithHref.get(1));
+
+        assertEquals(fooUrl+"/./page2",foo.nextPage.getLinkUrl());
+
+        assertEquals("www.example.com",foo.linkList.get(0).getLinkUrl());
+        assertEquals(fooUrl+"/./page3",foo.linkList.get(1).getLinkUrl());
+
 	}
 
     @Test
@@ -49,5 +61,5 @@ public class BrowserTest {
         final PageWithParameterizedURL foo = Browser.open(PageWithParameterizedURL.class,"x","y");
         assertEquals("http://www.foo.com/x/bar/y/baz",Browser.getCurentUrl());
     }
-	
+
 }

@@ -17,18 +17,24 @@ public class Link<T> {
 		this.currentPageUrl = currentPageUrl;
 	}
 
+    public String getLinkUrl(){
+        String urlToVisit;
+        final String href = node.attr("href");
+        urlToVisit = href;
+        if(href.startsWith("/")){
+            final String rootPage = currentPageUrl.replaceAll("(.*://.*?/).*","$1");
+            final String newPageUrl = rootPage.substring(0, rootPage.length() - 1) +href;
+            urlToVisit = newPageUrl;
+        }
+        if(href.startsWith(".")){
+            final String newPageUrl = currentPageUrl+"/"+href;
+            urlToVisit = newPageUrl;
+        }
+        return urlToVisit;
+    }
+
 	public T visit(){
-		final String href = node.attr("href");
-		if(href.startsWith("/")){
-			final String rootPage = type.getAnnotation(Page.class).value();
-			final String newPageUrl = rootPage.substring(0, rootPage.length() - 1) +href;
-			return Browser.open(newPageUrl, type);
-		}
-		if(href.startsWith(".")){
-			final String newPageUrl = currentPageUrl+href;
-			return Browser.open(newPageUrl, type);
-		}
-		return Browser.open(href, type);
+		return Browser.open(getLinkUrl(), type);
 	}
 
 }

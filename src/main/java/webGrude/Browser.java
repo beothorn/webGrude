@@ -10,6 +10,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -78,7 +79,14 @@ public class Browser {
     }
 
 	private static <T> T loadPage(final String pageUrl, final Class<T> pageClass, final String... params) throws MalformedURLException, IOException, ClientProtocolException,  IllegalAccessException {
-        Browser.currentPageUrl = MessageFormat.format(pageUrl, params);;
+
+        String[] formattedParams = new String[params.length];
+
+        for(int i = 0 ; i < params.length; i++){
+            formattedParams[i] = URLEncoder.encode(params[i],"UTF-8");
+        }
+
+        Browser.currentPageUrl = MessageFormat.format(pageUrl, formattedParams);
 
 		final URL url = new URL(Browser.currentPageUrl);
 		final String protocol = url.getProtocol();
@@ -169,11 +177,17 @@ public class Browser {
 
 	private static <T> void solveAnnotatedListField(final Element node, final T newInstance, final Field f) throws IllegalAccessException, InstantiationException {
 		final Type genericType = f.getGenericType();
-		final Class<?> listClass = (Class<?>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
-		final String cssQuery = f.getAnnotation(Selector.class).value();
+        final String cssQuery = f.getAnnotation(Selector.class).value();
         final String attribute = f.getAnnotation(Selector.class).attr();
-		final Elements nodes = node.select(cssQuery);
-		f.set(newInstance, populate(nodes,attribute, listClass));
+        final Elements nodes = node.select(cssQuery);
+
+        Type type = ((ParameterizedType) genericType).getActualTypeArguments()[0];
+        if(type instanceof ParameterizedType){
+            f.set(newInstance, populateListOfLinks(nodes, attribute, (ParameterizedType)type));
+        }else{
+            final Class<?> listClass = (Class<?>) type;
+            f.set(newInstance, populateList(nodes, attribute, listClass));
+        }
 	}
 
 	private static <T> void solveListOfAnnotatedType(final Element node, final T newInstance, final Field f) throws IllegalAccessException, InstantiationException {
@@ -185,11 +199,11 @@ public class Browser {
 			final String cssQuery = selectorAnnotation.value();
             final String attribute = selectorAnnotation.attr();
 			final Elements nodes = node.select(cssQuery);
-			f.set(newInstance, populate(nodes,attribute, listClass));
+			f.set(newInstance, populateList(nodes, attribute, listClass));
 		}
 	}
 
-	private static <T> List<T> populate(final Elements nodes,String attribute, final Class<T> classs) throws InstantiationException, IllegalAccessException {
+	private static <T> List<T> populateList(final Elements nodes, String attribute, final Class<T> classs) throws InstantiationException, IllegalAccessException {
 		final ArrayList<T> newInstanceList = new ArrayList<T>();
 		final Iterator<Element> iterator = nodes.iterator();
 		while (iterator.hasNext()) {
@@ -202,5 +216,17 @@ public class Browser {
 		}
 		return newInstanceList;
 	}
+
+    private static <T> ArrayList<Link<T>> populateListOfLinks(final Elements nodes, String attribute, final ParameterizedType paraType) throws InstantiationException, IllegalAccessException {
+        final ArrayList<Link<T>> newInstanceList = new ArrayList<Link<T>>();
+        final Iterator<Element> iterator = nodes.iterator();
+        while (iterator.hasNext()) {
+            final Element node = iterator.next();
+            Class<?> classs = (Class<?>) paraType.getActualTypeArguments()[0];
+            Link<T> link = (Link<T>) Instantiator.visitableForNode(node, classs, Browser.currentPageUrl);
+            newInstanceList.add(link);
+        }
+        return newInstanceList;
+    }
 
 }
