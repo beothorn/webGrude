@@ -30,3 +30,14 @@ public class PirateBayExample {
 ```
 
 For more complex use cases check see src/test/java/webGrude/BrowserTest.java
+
+Maven dependency
+=========
+
+```xml
+<dependency>
+  <groupId>com.github.beothorn</groupId>
+  <artifactId>webGrude</artifactId>
+  <version>0.0.2</version>
+</dependency>
+```
