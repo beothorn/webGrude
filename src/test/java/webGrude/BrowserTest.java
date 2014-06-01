@@ -9,28 +9,27 @@ import java.io.IOException;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class BrowserTest {
 
-	@Test
-	public void test(){
-		
-		final String fooUrl = Foo.class.getResource("Foo.html").toString();
-		final Foo foo = Browser.open(fooUrl,Foo.class);
-		
-		assertEquals("Title",foo.someContent.title);
-		assertEquals("Lorem ipsum",foo.someContent.text);
-		
-		assertEquals("Nested content Title",foo.someNestedContent.header);
-		assertEquals("Nested content",foo.someNestedContent.content);
-		
-		assertEquals(2,foo.section.someRepeatingContent.size());
-		assertEquals("bar baz",foo.section.someRepeatingContent.get(0));
-		assertEquals("bar2 baz2",foo.section.someRepeatingContent.get(1));
-		
-		assertEquals("<p> Get content as <br /> element </p>",foo.htmlContent.html());
+    @Test
+    public void test(){
+
+        final String fooUrl = Foo.class.getResource("Foo.html").toString();
+        final Foo foo = Browser.open(fooUrl,Foo.class);
+
+        assertEquals("Title",foo.someContent.title);
+        assertEquals("Lorem ipsum",foo.someContent.text);
+
+        assertEquals("Nested content Title",foo.someNestedContent.header);
+        assertEquals("Nested content",foo.someNestedContent.content);
+
+        assertEquals(2,foo.section.someRepeatingContent.size());
+        assertEquals("bar baz",foo.section.someRepeatingContent.get(0));
+        assertEquals("bar2 baz2",foo.section.someRepeatingContent.get(1));
+
+        assertEquals("<p> Get content as <br /> element </p>",foo.htmlContent.html());
 
         assertEquals("linkToBeExtracted1",foo.linksWithHref.get(0));
         assertEquals("linkToBeExtracted2",foo.linksWithHref.get(1));
@@ -47,7 +46,7 @@ public class BrowserTest {
         assertEquals(3.1415,foo.fHref,0.00001);
         assertTrue(foo.b);
 
-	}
+    }
 
     @Test
     public void testUrlSubstitution(){

@@ -31,20 +31,56 @@ import webGrude.http.SimpleHttpClientImpl;
 
 import com.google.common.reflect.TypeToken;
 
+/**
+ * Instantiate a class with Page annotations from a web page or a html file.
+ * <p>
+ * Examples:<br>
+ * <br>
+ * To load a class 
+ * that is annotated as <i>{@literal @}Page("http://www.example.com")</i><br>
+ * <p>
+ *   <i>ExamplePage example = Browser.open(ExamplePage.class)</i>
+ * </p>
+ * <br>
+ * To load a class 
+ * that is annotated as <i>{@literal @}Page</i> with another url<br>
+ * <p>
+ *   <i>ExamplePage example = Browser.open("www.foo.bar", ExamplePage.class)</i>
+ * </p>
+ * <br>
+ * To load a class 
+ * that is annotated with 
+ * a parameterized annotation <i>{@literal @}Page("http://www.example.com/?name={0}&page={1}")</i> 
+ * <p>
+ *   <i>ExamplePage example = Browser.open(ExamplePage.class, "john", "1")</i>
+ * </p> 
+ * @author beothorn
+ * @see webGrude.annotations.Page
+ * @see webGrude.annotations.Selector
+ */
 public class Browser {
 
     private static SimpleHttpClient webClient;
     private static String currentPageUrl;
 
-	public static <T> T open(final Class<T> pageClass,final String... params) {
-		cryIfNotAnnotated(pageClass);
-		try {
-			final String pageUrl = pageClass.getAnnotation(Page.class).value();
-			return loadPage(pageUrl, pageClass, params);
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
+    /**
+     *  Loads content from url onto an instance of pageClass.
+     * 
+     * 
+     * @param pageClass A class with a {@literal @}Page annotantion
+     * @param params Optional, if the pageClass has a url with parameters
+     * @return The class instantiated and with the fields with the
+     * {@literal @}Selector annotation populated.
+     */
+    public static <T> T open(final Class<T> pageClass,final String... params) {
+            cryIfNotAnnotated(pageClass);
+            try {
+                    final String pageUrl = pageClass.getAnnotation(Page.class).value();
+                    return loadPage(pageUrl, pageClass, params);
+            } catch (final Exception e) {
+                    throw new RuntimeException(e);
+            }
+    }
 
     public static String getCurentUrl() {
         return currentPageUrl;
