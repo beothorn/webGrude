@@ -29,7 +29,14 @@ public class Foo {
 	@Selector("p a") public Link<Foo> nextPage;
     @Selector(value = "#links a",attr = "href") public List<String> linksWithHref;
     @Selector(value = "#linkList a",attr = "href") public List<Link<Foo>> linkList;
-	
+    @Selector(".doesNotExist") public List<String> doesNotExist;
+
+    @Selector("#float") public float f;
+    @Selector("#integer") public int i;
+    @Selector("#boolean") public boolean b;
+
+    @Selector(value = "#numberOnAnAttribute", attr = "href") public float fHref;
+
 	public SomeContent someContent;
 	public SomeNestedContent someNestedContent;
 	public Section section;

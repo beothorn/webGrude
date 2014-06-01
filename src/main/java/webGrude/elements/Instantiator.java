@@ -1,32 +1,54 @@
 package webGrude.elements;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.jsoup.nodes.Element;
+
+import java.util.List;
 
 @SuppressWarnings("rawtypes")
 public class Instantiator {
 
-	private static List<Class> classes;
-	static {
-		classes = new ArrayList<Class>();
-		classes.add(String.class);
-		classes.add(Link.class);
-		classes.add(Element.class);
-	}
-	
 	public static boolean typeIsKnown(final Class c){
-		return classes.contains(c);
+
+        if(c.equals(String.class))
+            return true;
+        if(c.equals(Integer.class) || c.getSimpleName().equals("int"))
+            return true;
+        if(c.equals(Float.class) || c.getSimpleName().equals("float"))
+            return true;
+        if(c.equals(Boolean.class) || c.getSimpleName().equals("boolean"))
+            return true;
+        if(c.equals(Link.class))
+            return true;
+        if(c.equals(Element.class))
+            return true;
+        if(c.equals(List.class))
+            return true;
+
+		return false;
 	}
 
 	@SuppressWarnings("unchecked")
     public static <T> T instanceForNode(final Element node, String attribute, final Class<T> c){
         if(c.equals(Element.class))
             return (T) node;
+
+        String value;
+
         if(attribute != null && !attribute.isEmpty())
-            return (T) node.attr(attribute);
-        return (T) node.text();
+            value = node.attr(attribute);
+        else
+            value = node.text();
+
+        if(c.equals(String.class))
+            return (T) value;
+        if(c.equals(Integer.class) || c.getSimpleName().equals("int"))
+            return (T) Integer.valueOf(value);
+        if(c.equals(Float.class) || c.getSimpleName().equals("float"))
+            return (T) Float.valueOf(value);
+        if(c.equals(Boolean.class) || c.getSimpleName().equals("boolean"))
+            return (T) Boolean.valueOf(value);
+
+        return (T) value;
     }
 
 	public static boolean typeIsVisitable(final Class<?> fieldClass) {

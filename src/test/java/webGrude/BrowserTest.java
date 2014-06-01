@@ -1,20 +1,16 @@
 package webGrude;
 
-import static org.junit.Assert.assertEquals;
-
 import org.apache.http.client.ClientProtocolException;
 import org.junit.Test;
-import webGrude.annotations.Page;
-import webGrude.annotations.Selector;
-import webGrude.elements.Link;
 import webGrude.http.SimpleHttpClient;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class BrowserTest {
 
@@ -43,6 +39,13 @@ public class BrowserTest {
 
         assertEquals("www.example.com",foo.linkList.get(0).getLinkUrl());
         assertEquals(fooUrl+"/./page3",foo.linkList.get(1).getLinkUrl());
+
+        assertEquals(0,foo.doesNotExist.size());
+
+        assertEquals(42,foo.i);
+        assertEquals(42.24,foo.f,0.001);
+        assertEquals(3.1415,foo.fHref,0.00001);
+        assertTrue(foo.b);
 
 	}
 
