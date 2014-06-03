@@ -51,7 +51,7 @@ import com.google.common.reflect.TypeToken;
  * that is annotated with 
  * a parameterized annotation <i>{@literal @}Page("http://www.example.com/?name={0}&page={1}")</i> 
  * <p>
- *   <i>ExamplePage example = Browser.open(ExamplePage.class, "john", "1")</i>
+ *   <i>ExamplePage example = Browser.open(ExamplePage.class, "john", "1");</i>
  * </p> 
  * @author beothorn
  * @see webGrude.annotations.Page
