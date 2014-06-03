@@ -13,20 +13,29 @@ import java.lang.annotation.Target;
  * The Value is optional, it's possible to load other url using the Browser 
  * with this same class.<br>
  * It's also possible to parameterize the url using the tokens {0}, {2}, ...
+ * </p>
  * <p>
  * A class to map the example home page would be annotated as such <br>
- * <p>
- * <i>{@literal @}Page("http://www.example.com")</i>
  * </p>
+ * <pre>
+ * {@code
+ * @Page("http://www.example.com");
+ * }
+ * </pre>
  * <p>
  * A class to load a url parameterized could be like this <br>
- * <p>
- * <i>{@literal @}Page("http://www.example.com/{0}/foo={1}/bar")</i>
  * </p>
+ * <pre>
+ * {@code
+ * @Page("http://www.example.com/{0}/foo={1}/bar");
+ * }
+ * </pre>
  * The url can be empty and defined on the Browser open call<br>
- * <p>
- * <i>{@literal @}Page</i>
- * </p>
+ * <pre>
+ * {@code
+ * @Page
+ * }
+ * </pre>
  * @author beothorn
  * @see webGrude.Browser#open(Class, String...)
  * @see webGrude.Browser#open(String, Class, String...)

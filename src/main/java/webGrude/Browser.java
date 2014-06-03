@@ -33,8 +33,8 @@ import com.google.common.reflect.TypeToken;
 /**
  * Instantiate a class with Page annotations from a web page or a html file.
  * <p>
- * Examples:<br>
- * <br>
+ * Examples:
+ * </p>
  * To load a class 
  * that is annotated as <i>{@literal @}Page("http://www.example.com")</i><br>
  * <pre>
