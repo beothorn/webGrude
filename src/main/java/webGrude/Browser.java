@@ -49,7 +49,7 @@ import com.google.common.reflect.TypeToken;
  * <br>
  * To load a class 
  * that is annotated with 
- * a parameterized annotation <i>{@literal @};Page("http://www.example.com/?name={0}&page={1}")</i>
+ * a parameterized annotation {@code @Page("http://www.example.com/?name={0}&page={1}")};
  * <pre>
  * {@code ExamplePage example = Browser.open(ExamplePage.class, "john", "1");};
  * </pre>

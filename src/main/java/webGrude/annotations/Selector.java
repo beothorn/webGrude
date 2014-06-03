@@ -24,7 +24,6 @@ import java.lang.annotation.Target;
  * Or a List of any of these types.<br>
  * You can also set the field as an attribute value instead of it's text using
  * the attr annotation value. See the examples on how to do that.
- * </p>
  * <p>
  * A field mapping a link with id foo
  * </p>
