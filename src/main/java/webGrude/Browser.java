@@ -66,6 +66,7 @@ public class Browser {
      *  Loads content from url onto an instance of pageClass.
      *  Same as open.
      *
+     * @param <T> A instance of the class with a {@literal @}Page annotantion
      * @param pageClass A class with a {@literal @}Page annotantion
      * @param params Optional, if the pageClass has a url with parameters
      * @return The class instantiated and with the fields with the
@@ -78,7 +79,8 @@ public class Browser {
     /**
      *  Loads content from url onto an instance of pageClass.
      *  Same as get.
-     * 
+     *
+     * @param <T> A instance of the class with a {@literal @}Page annotantion
      * @param pageClass A class with a {@literal @}Page annotantion
      * @param params Optional, if the pageClass has a url with parameters
      * @return The class instantiated and with the fields with the
