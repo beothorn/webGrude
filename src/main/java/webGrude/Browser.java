@@ -5,14 +5,13 @@ import static webGrude.elements.Instantiator.typeIsKnown;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -22,6 +21,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import webGrude.annotations.AfterPageLoad;
 import webGrude.annotations.Page;
 import webGrude.annotations.Selector;
 import webGrude.elements.Instantiator;
@@ -65,7 +65,20 @@ public class Browser {
 
     /**
      *  Loads content from url onto an instance of pageClass.
-     * 
+     *  Same as open.
+     *
+     * @param pageClass A class with a {@literal @}Page annotantion
+     * @param params Optional, if the pageClass has a url with parameters
+     * @return The class instantiated and with the fields with the
+     * {@literal @}Selector annotation populated.
+     */
+    public static <T> T get(final Class<T> pageClass,final String... params) {
+        return open(pageClass, params);
+    }
+
+    /**
+     *  Loads content from url onto an instance of pageClass.
+     *  Same as get.
      * 
      * @param pageClass A class with a {@literal @}Page annotantion
      * @param params Optional, if the pageClass has a url with parameters
@@ -134,12 +147,25 @@ public class Browser {
 			parse = Jsoup.parse(page);
 		}
 
+        T t;
         try {
-		    return loadDomContents(parse, pageClass);
+            t = loadDomContents(parse, pageClass);
         }catch(InstantiationException e){
             throw new RuntimeException("Maybe you forgot to write your internal class as 'public static'?", e);
         }
-	}
+
+        Method[] declaredMethods = pageClass.getDeclaredMethods();
+        for (Method declaredMethod : declaredMethods) {
+            if(declaredMethod.getAnnotation(AfterPageLoad.class) != null){
+                try {
+                    declaredMethod.invoke(t);
+                } catch (InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return t;
+    }
 
 	private static <T> T loadDomContents(final Element node, final Class<T> classs) throws IllegalAccessException, InstantiationException {
 
