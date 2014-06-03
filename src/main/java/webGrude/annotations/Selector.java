@@ -10,8 +10,8 @@ import java.lang.annotation.Target;
  * <p>
  * A field annotated with this will receive the value correspondin to it's css
  * selector when the webgrude Browser loads a page. This field <b>must</b> be in
- * a class annotated with <i>{@literal @}Page</i>.
- * The field type can be any class with the <i>{@literal @}Page</i> or one of 
+ * a class annotated with <i>{@literal @};Page</i>.
+ * The field type can be any class with the <i>{@literal @};Page</i> or one of
  * the following types (or its primitive):
  * <ul>
  * <li>String</li>
@@ -29,25 +29,19 @@ import java.lang.annotation.Target;
  * A field mapping a link with id foo
  * </p>
  * <pre>
- * {@code
- * @Selector("#foo") String fooText;
- * }
+ * {@code @Selector("#foo") String fooText;};
  * </pre>
  * <p>
  * A field mapping a link with id foo but receiving the href value
  * </p>
  * <pre>
- * {@code
- * @Selector(value = "#foo", attr="href") String fooText;
- * }
+ * {@code @Selector(value = "#foo", attr="href") String fooText;};
  * </pre>
  * <p>
  * A field mapping a link with id foo but receiving the href value
  * </p>
  * <pre>
- * {@code
- * @Selector(value = "#foo", attr="href") String fooText;
- * }
+ * {@code @Selector(value = "#foo", attr="href") String fooText;};
  * </pre>
  * @author beothorn
  * @see webGrude.annotations.Page

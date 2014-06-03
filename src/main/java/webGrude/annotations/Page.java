@@ -18,23 +18,17 @@ import java.lang.annotation.Target;
  * A class to map the example home page would be annotated as such <br>
  * </p>
  * <pre>
- * {@code
- * @Page("http://www.example.com");
- * }
+ * {@code @Page("http://www.example.com");};
  * </pre>
  * <p>
  * A class to load a url parameterized could be like this <br>
  * </p>
  * <pre>
- * {@code
- * @Page("http://www.example.com/{0}/foo={1}/bar");
- * }
+ * {@code @Page("http://www.example.com/{0}/foo={1}/bar");};
  * </pre>
  * The url can be empty and defined on the Browser open call<br>
  * <pre>
- * {@code
- * @Page
- * }
+ * {@code @Page};
  * </pre>
  * @author beothorn
  * @see webGrude.Browser#open(Class, String...)
