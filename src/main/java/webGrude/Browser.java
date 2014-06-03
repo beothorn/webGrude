@@ -37,22 +37,28 @@ import com.google.common.reflect.TypeToken;
  * <br>
  * To load a class 
  * that is annotated as <i>{@literal @}Page("http://www.example.com")</i><br>
- * <p>
- *   <i>ExamplePage example = Browser.open(ExamplePage.class)</i>
- * </p>
+ * <pre>
+ * {@code
+ *   ExamplePage example = Browser.open(ExamplePage.class);
+ * }
+ * </pre>
  * <br>
  * To load a class 
  * that is annotated as <i>{@literal @}Page</i> with another url<br>
- * <p>
- *   <i>ExamplePage example = Browser.open("www.foo.bar", ExamplePage.class)</i>
- * </p>
+ * <pre>
+ * {@code
+ *   ExamplePage example = Browser.open("www.foo.bar", ExamplePage.class);
+ * }
+ * </pre>
  * <br>
  * To load a class 
  * that is annotated with 
  * a parameterized annotation <i>{@literal @}Page("http://www.example.com/?name={0}&page={1}")</i> 
- * <p>
- *   <i>ExamplePage example = Browser.open(ExamplePage.class, "john", "1");</i>
- * </p> 
+ * <pre>
+ * {@code
+ * ExamplePage example = Browser.open(ExamplePage.class, "john", "1");
+ * }
+ * </pre>
  * @author beothorn
  * @see webGrude.annotations.Page
  * @see webGrude.annotations.Selector

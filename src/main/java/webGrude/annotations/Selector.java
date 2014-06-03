@@ -26,19 +26,24 @@ import java.lang.annotation.Target;
  * the attr annotation value. See the examples on how to do that.
  * <p>
  * A field mapping a link with id foo <br>
- * <p>
- * <i>{@literal @}Selector("#foo") String fooText;</i>
- * </p>
+ * <pre>
+ * {@code
+ * @Selector("#foo") String fooText;
+ * }
+ * </pre>
+ * A field mapping a link with id foo but receiving the href value<br>
+ * <pre>
+ * {@code
+ * @Selector(value = "#foo", attr="href") String fooText;
+ * }
+ * </pre>
  * <p>
  * A field mapping a link with id foo but receiving the href value<br>
- * <p>
- * <i>{@literal @}Selector(value = "#foo", attr="href") String fooText;</i>
- * </p>
- * <p>
- * A field mapping a link with id foo but receiving the href value<br>
- * <p>
- * <i>{@literal @}Selector(value = "#foo", attr="href") String fooText;</i>
- * </p>
+ * <pre>
+ * {@code
+ * @Selector(value = "#foo", attr="href") String fooText;
+ * }
+ * </pre>
  * @author beothorn
  * @see webGrude.annotations.Page
  * @see webGrude.elements.Link
