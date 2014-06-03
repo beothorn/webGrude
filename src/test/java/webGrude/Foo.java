@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.jsoup.nodes.Element;
 
+import webGrude.annotations.AfterPageLoad;
 import webGrude.annotations.Page;
 import webGrude.annotations.Selector;
 import webGrude.elements.Link;
@@ -40,5 +41,12 @@ public class Foo {
     public SomeContent someContent;
     public SomeNestedContent someNestedContent;
     public Section section;
+
+    public int afterLoadValue;
+
+    @AfterPageLoad
+    public void copyIntegerMinusOne(){
+        afterLoadValue = i - 1;
+    }
 
 }

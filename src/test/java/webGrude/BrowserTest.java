@@ -46,6 +46,7 @@ public class BrowserTest {
         assertEquals(3.1415,foo.fHref,0.00001);
         assertTrue(foo.b);
 
+        assertEquals(41,foo.afterLoadValue);
     }
 
     @Test
