@@ -28,8 +28,8 @@ import java.lang.annotation.Target;
  * <i>{@literal @}Page</i>
  * </p>
  * @author beothorn
- * @see webgrude.Browser#open(final Class<T> pageClass,final String... params)
- * @see webgrude.Browser#open(final String pageUrl, final Class<T> pageClass, final String... params)
+ * @see webGrude.Browser#open(Class, String...)
+ * @see webGrude.Browser#open(String, Class, String...)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

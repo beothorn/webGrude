@@ -22,7 +22,7 @@ import webGrude.Browser;
  * <p>
  * <i> ExamplePage examplePage = linkToExample.visit(); </i>
  * </p> 
- * @see webgrude.Browser
+ * @see webGrude.Browser
  * @see webGrude.annotations.Page
  * @see webGrude.annotations.Selector
  * @author beothorn
