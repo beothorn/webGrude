@@ -20,10 +20,7 @@ public class PirateBayExample {
     }
 
     public static void main(String... args){
-        SearchResult tpb = Browser.open(SearchResult.class, "ubuntu iso");
-        for (String magnetLink : tpb.magnets){
-            System.out.println(magnetLink);
-        }
+        Browser.open(SearchResult.class, "ubuntu iso").magnets.forEach(s -> System.out.println(s));
     }
 
 }
@@ -38,6 +35,6 @@ Maven dependency
 <dependency>
   <groupId>com.github.beothorn</groupId>
   <artifactId>webGrude</artifactId>
-  <version>0.0.2</version>
+  <version>0.0.3</version>
 </dependency>
 ```
