@@ -36,22 +36,22 @@ import com.google.common.reflect.TypeToken;
  * Examples:
  * </p>
  * To load a class 
- * that is annotated as <i>{@literal @};Page("http://www.example.com")</i><br>
+ * that is annotated as <i>{@literal @}Page("http://www.example.com")</i><br>
  * <pre>
  * {@code ExamplePage example = Browser.open(ExamplePage.class);};
  * </pre>
  * <br>
  * To load a class 
- * that is annotated as <i>{@literal @};Page</i> with another url<br>
+ * that is annotated as <i>{@literal @}Page</i> with another url<br>
  * <pre>
  * {@code ExamplePage example = Browser.open("www.foo.bar", ExamplePage.class);};
  * </pre>
  * <br>
  * To load a class 
  * that is annotated with 
- * a parameterized annotation {@code @Page("http://www.example.com/?name={0}&page={1}")};
+ * a parameterized annotation {@code @Page("http://www.example.com/?name={0}&page={1}")}
  * <pre>
- * {@code ExamplePage example = Browser.open(ExamplePage.class, "john", "1");};
+ * {@code ExamplePage example = Browser.open(ExamplePage.class, "john", "1");}
  * </pre>
  * @author beothorn
  * @see webGrude.annotations.Page
@@ -66,11 +66,11 @@ public class Browser {
      *  Loads content from url onto an instance of pageClass.
      *  Same as open.
      *
-     * @param <T> A instance of the class with a {@literal @};Page annotantion
-     * @param pageClass A class with a {@literal @};Page annotantion
+     * @param <T> A instance of the class with a {@literal @}Page annotantion
+     * @param pageClass A class with a {@literal @}Page annotantion
      * @param params Optional, if the pageClass has a url with parameters
      * @return The class instantiated and with the fields with the
-     * {@literal @};Selector annotation populated.
+     * {@literal @}Selector annotation populated.
      */
     public static <T> T get(final Class<T> pageClass,final String... params) {
         return open(pageClass, params);
@@ -80,11 +80,11 @@ public class Browser {
      *  Loads content from url onto an instance of pageClass.
      *  Same as get.
      *
-     * @param <T> A instance of the class with a {@literal @};Page annotantion
-     * @param pageClass A class with a {@literal @};Page annotantion
+     * @param <T> A instance of the class with a {@literal @}Page annotantion
+     * @param pageClass A class with a {@literal @}Page annotantion
      * @param params Optional, if the pageClass has a url with parameters
      * @return The class instantiated and with the fields with the
-     * {@literal @};Selector annotation populated.
+     * {@literal @}Selector annotation populated.
      */
     public static <T> T open(final Class<T> pageClass,final String... params) {
             cryIfNotAnnotated(pageClass);
