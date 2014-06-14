@@ -25,7 +25,7 @@ import webGrude.annotations.Page;
 import webGrude.annotations.Selector;
 import webGrude.elements.Instantiator;
 import webGrude.elements.Link;
-import webGrude.http.SimpleHttpClient;
+import webGrude.http.BrowserClient;
 import webGrude.http.SimpleHttpClientImpl;
 
 import com.google.common.reflect.TypeToken;
@@ -59,8 +59,9 @@ import com.google.common.reflect.TypeToken;
  */
 public class Browser {
 
-    private static SimpleHttpClient webClient;
+    private static BrowserClient webClient;
     private static String currentPageUrl;
+    private static String currentPage;
 
     /**
      *  Loads content from url onto an instance of pageClass.
@@ -100,7 +101,11 @@ public class Browser {
         return currentPageUrl;
     }
 
-    public static void setWebClient(final SimpleHttpClient client) {
+    public static String getCurentPage() {
+        return currentPage;
+    }
+
+    public static void setWebClient(final BrowserClient client) {
         webClient = client;
     }
 
@@ -145,6 +150,7 @@ public class Browser {
 			parse = Jsoup.parse(new File(url.getPath()), "UTF-8");
 		} else {
 			final String page = loadPage(Browser.currentPageUrl);
+            currentPage = page;
 			parse = Jsoup.parse(page);
 		}
 

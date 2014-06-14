@@ -2,7 +2,7 @@ package webGrude;
 
 import org.apache.http.client.ClientProtocolException;
 import org.junit.Test;
-import webGrude.http.SimpleHttpClient;
+import webGrude.http.BrowserClient;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,13 +53,8 @@ public class BrowserTest {
     public void testUrlSubstitution(){
 
         final String fooUrl = Foo.class.getResource("Foo.html").toString();
-        Browser.setWebClient(new SimpleHttpClient(){
-            @Override public String getToFile(String link, File destFile) throws ClientProtocolException, IOException {return "DUMMY";}
-            @Override public String getOrNull(String url) {return "DUMMY";}
-            @Override public String post(String postUrl, Map<String, String> params) throws ClientProtocolException, IOException {return "DUMMY";}
-            @Override public String post(String postUrl, String params) throws ClientProtocolException, IOException {return "DUMMY";}
+        Browser.setWebClient(new BrowserClient(){
             @Override public String get(String get) throws ClientProtocolException, IOException {return "DUMMY";}
-            @Override public void close() {}
         });
         final PageWithParameterizedURL foo = Browser.open(PageWithParameterizedURL.class,"x","y");
         assertEquals("http://www.foo.com/x/bar/y/baz",Browser.getCurentUrl());
