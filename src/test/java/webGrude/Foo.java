@@ -11,6 +11,13 @@ import webGrude.elements.Link;
 
 @Page
 public class Foo {
+
+    @Selector("")
+    static public class SomeRepeatingContent {
+        @Selector(".head") public String head;
+        @Selector(".tail") public String tail;
+    }
+
     @Selector("#some-content") static public class SomeContent {
             @Selector("h1") public String title;
             @Selector("div") public String text;
@@ -31,6 +38,7 @@ public class Foo {
     @Selector(value = "#links a",attr = "href") public List<String> linksWithHref;
     @Selector(value = "#linkList a",attr = "href") public List<Link<Foo>> linkList;
     @Selector(".doesNotExist") public List<String> doesNotExist;
+    @Selector(".some-repeating-content-outside-a-tag") public List<SomeRepeatingContent> repeatingContentsNoSurroundingTag;
 
     @Selector("#float") public float f;
     @Selector("#integer") public int i;

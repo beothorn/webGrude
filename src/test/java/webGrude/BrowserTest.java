@@ -39,6 +39,11 @@ public class BrowserTest {
         assertEquals("www.example.com",foo.linkList.get(0).getLinkUrl());
         assertEquals(fooUrl+"/./page3",foo.linkList.get(1).getLinkUrl());
 
+        assertEquals("HEAD1",foo.repeatingContentsNoSurroundingTag.get(0).head);
+        assertEquals("TAIL1",foo.repeatingContentsNoSurroundingTag.get(0).tail);
+        assertEquals("HEAD2",foo.repeatingContentsNoSurroundingTag.get(1).head);
+        assertEquals("TAIL2",foo.repeatingContentsNoSurroundingTag.get(1).tail);
+
         assertEquals(0,foo.doesNotExist.size());
 
         assertEquals(42,foo.i);
