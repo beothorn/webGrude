@@ -54,12 +54,10 @@ public class BrowserTest {
 
     @Test
     public void testUrlSubstitution(){
-
-        final String fooUrl = Foo.class.getResource("Foo.html").toString();
         Browser.setWebClient(new BrowserClient(){
             @Override public String get(String get) throws ClientProtocolException, IOException {return "DUMMY";}
         });
-        final PageWithParameterizedURL foo = Browser.open(PageWithParameterizedURL.class,"x","y");
+        Browser.open(PageWithParameterizedURL.class,"x","y");
         assertEquals("http://www.foo.com/x/bar/y/baz",Browser.getCurentUrl());
     }
 

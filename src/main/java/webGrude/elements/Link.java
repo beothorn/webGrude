@@ -15,7 +15,7 @@ import webGrude.Browser;
  * and it has a link for www.example.com, wich is mapped by a ExamplePage class,
  * the field should look like this:<br>
  * <p>
- * <i>{@literal @}Selector("a.linksToExample") Link{@literal <}ExamplePage{@literal ></}ExamplePage{@literal>} linkToExample; </i>
+ * <i>{@literal @}Selector("a.linksToExample") Link{@literal <}ExamplePage{@literal ></}ExamplePage{@literal >} linkToExample; </i>
  * </p>
  * After the webgrude Browser opens the page, the field linkToExample will 
  * contain a link that can be visited:
