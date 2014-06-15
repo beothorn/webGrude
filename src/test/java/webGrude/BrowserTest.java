@@ -4,9 +4,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.junit.Test;
 import webGrude.http.BrowserClient;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
