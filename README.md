@@ -42,5 +42,5 @@ Maven dependency
 Resources
 =========
 
-Reference on jsoup Selector -> http://jsoup.org/apidocs/org/jsoup/select/Selector.html  
+Reference on jsoup Selector http://jsoup.org/apidocs/org/jsoup/select/Selector.html  
 Try jsoup online http://try.jsoup.org/
