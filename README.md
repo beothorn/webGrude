@@ -38,3 +38,8 @@ Maven dependency
   <version>0.0.4</version>
 </dependency>
 ```
+
+Resources
+
+Reference on jsoup Selector -> http://jsoup.org/apidocs/org/jsoup/select/Selector.html
+Try jsoup online http://try.jsoup.org/
