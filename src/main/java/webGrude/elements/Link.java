@@ -30,18 +30,26 @@ import webGrude.Browser;
 public class Link<T> {
 
 	private final Class<T> type;
-	private final Element node;
+	private final Element hrefElement;
 	private final String currentPageUrl;
-
-	public Link(final Element node, final Class<T> type, final String currentPageUrl) {
-		this.node = node;
-		this.type = type;
-		this.currentPageUrl = currentPageUrl;
+	
+	/***
+	 * A link uses maps a page from an url to an instance of a class annotated with <i>{@literal @}Page</i>. 
+	 * when the method {@link #visit() visit} is called
+	 * 
+	 * @param hrefElement A Jsoup Element with a href attribute
+	 * @param visitingType The type that will be mapped from the page when the method {@link #visit() visit} is called
+	 * @param baseUrl The base url, it is used to resolve relative links
+	 */
+	public Link(final Element hrefElement, final Class<T> visitingType, final String baseUrl) {
+		this.hrefElement = hrefElement;
+		this.type = visitingType;
+		this.currentPageUrl = baseUrl.endsWith("/")?baseUrl.substring(0, baseUrl.length()-2):baseUrl;
 	}
 
     public String getLinkUrl(){
         String urlToVisit;
-        final String href = node.attr("href");
+        final String href = hrefElement.attr("href");
         urlToVisit = href;
         if(href.startsWith("/")){
             final String rootPage = currentPageUrl.replaceAll("(.*://.*?/).*","$1");
@@ -54,7 +62,11 @@ public class Link<T> {
         }
         return urlToVisit;
     }
-
+    /***
+     * Visit a page link and map its values to an instance of the visitingType.
+     * 
+     * @return an instance of visitingType 
+     */
 	public T visit(){
 		return Browser.open(getLinkUrl(), type);
 	}

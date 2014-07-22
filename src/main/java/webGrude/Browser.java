@@ -126,11 +126,7 @@ public class Browser {
     private static String loadPage(String pageUrl, final String... params){
         if(webClient == null)
             setWebClient(new SimpleHttpClientImpl());
-        try {
-            return webClient.get(pageUrl);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return webClient.get(pageUrl);
     }
 
 	private static <T> T loadPage(final String pageUrl, final Class<T> pageClass, final String... params) throws MalformedURLException, IOException, ClientProtocolException,  IllegalAccessException {

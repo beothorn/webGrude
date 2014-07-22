@@ -16,15 +16,37 @@ import org.apache.http.impl.client.HttpClients;
 public class SimpleHttpClientImpl implements BrowserClient {
 
 	private final CloseableHttpClient httpclient;
+	private String userAgent= "Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.13) Gecko/20101206 Ubuntu/10.10 (maverick) Firefox/3.6.13";
 
 	public SimpleHttpClientImpl() {
-        httpclient = HttpClients.createDefault();
+		httpclient = HttpClients.createDefault();
+	}
+	
+	public String getUserAgent() {
+		return userAgent;
 	}
 
-	public String get(final String get) throws ClientProtocolException, IOException {
-        HttpUriRequest request = RequestBuilder.get()
+	public void setUserAgent(String userAgent) {
+		this.userAgent = userAgent;
+	}
+
+	public String get(final String get){
+		try {
+			return internalGet(get);
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+			return e.getMessage();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return e.getMessage();
+		}
+	}
+
+	private String internalGet(final String get) throws IOException,
+			ClientProtocolException {
+		HttpUriRequest request = RequestBuilder.get()
                 .setUri(get)
-                .setHeader("User-Agent", "Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.13) Gecko/20101206 Ubuntu/10.10 (maverick) Firefox/3.6.13")
+                .setHeader("User-Agent", userAgent)
                 .build();
         CloseableHttpResponse execute = httpclient.execute(request);
         final HttpEntity entity =  execute.getEntity();

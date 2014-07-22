@@ -55,7 +55,7 @@ public class BrowserTest {
     @Test
     public void testUrlSubstitution(){
         Browser.setWebClient(new BrowserClient(){
-            @Override public String get(String get) throws ClientProtocolException, IOException {return "DUMMY";}
+            public String get(String get){return "DUMMY";}
         });
         Browser.open(PageWithParameterizedURL.class,"x","y");
         assertEquals("http://www.foo.com/x/bar/y/baz",Browser.getCurentUrl());
