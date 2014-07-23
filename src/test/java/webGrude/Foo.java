@@ -54,6 +54,8 @@ public class Foo {
     public Section section;
 
     public int afterLoadValue;
+    
+    private Foo(){}
 
     @AfterPageLoad
     public void copyIntegerMinusOne(){

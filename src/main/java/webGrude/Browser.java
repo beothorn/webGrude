@@ -150,12 +150,7 @@ public class Browser {
 			parse = Jsoup.parse(page);
 		}
 
-        T t;
-        try {
-            t = loadDomContents(parse, pageClass);
-        }catch(InstantiationException e){
-            throw new RuntimeException("Maybe you forgot to write your internal class as 'public static'?", e);
-        }
+        T t = loadDomContents(parse, pageClass);
 
         Method[] declaredMethods = pageClass.getDeclaredMethods();
         for (Method declaredMethod : declaredMethods) {
@@ -170,9 +165,22 @@ public class Browser {
         return t;
     }
 
-	private static <T> T loadDomContents(final Element node, final Class<T> classs) throws IllegalAccessException, InstantiationException {
+	private static <T> T loadDomContents(final Element node, final Class<T> classs){
+		try {
+			return internalLoadDomContents(node, classs);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-        final T newInstance = classs.newInstance();
+	private static <T> T internalLoadDomContents(final Element node,
+			final Class<T> classs) throws NoSuchMethodException,
+			InstantiationException, IllegalAccessException,
+			InvocationTargetException {
+		Constructor<T> constructor;
+		constructor = classs.getDeclaredConstructor(new Class[0]);
+		constructor.setAccessible(true);		
+		final T newInstance = constructor.newInstance(new Object[0]);
 
 		if (classs.getAnnotation(Selector.class) == null && classs.getAnnotation(Page.class) == null)
 			return newInstance;
