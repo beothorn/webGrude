@@ -16,11 +16,15 @@ public class PirateBay {
 
     @Page("http://thepiratebay.se/search/{0}/0/7/0")
     public static class SearchResult {
-        @Selector(value = "#searchResult tbody tr td a[href*=magnet]", attr = "href") public List<String> magnets;
+        @Selector(value = "#searchResult tbody tr td a[href*=magnet]", attr = "href")
+        public List<String> magnets;
     }
 
     public static void main(String... args){
-        Browser.get(SearchResult.class, "ubuntu iso").magnets.forEach(System.out::println);
+        Browser
+            .get(SearchResult.class, "ubuntu iso")
+            .magnets
+            .forEach(System.out::println);
     }
 
 }
