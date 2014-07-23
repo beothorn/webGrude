@@ -35,7 +35,7 @@ Maven dependency
 <dependency>
   <groupId>com.github.beothorn</groupId>
   <artifactId>webGrude</artifactId>
-  <version>0.0.4</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 
