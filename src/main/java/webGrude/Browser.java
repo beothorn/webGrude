@@ -65,7 +65,6 @@ public class Browser {
 
     /**
      *  Loads content from url onto an instance of pageClass.
-     *  Same as open.
      *
      * @param <T> A instance of the class with a {@literal @}Page annotantion
      * @param pageClass A class with a {@literal @}Page annotantion

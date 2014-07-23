@@ -31,8 +31,8 @@ import java.lang.annotation.Target;
  * {@code @Page}
  * </pre>
  * @author beothorn
- * @see webGrude.Browser#open(Class, String...)
- * @see webGrude.Browser#open(String, Class, String...)
+ * @see webGrude.Browser#get(Class, String...)
+ * @see webGrude.Browser#get(String, Class, String...)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

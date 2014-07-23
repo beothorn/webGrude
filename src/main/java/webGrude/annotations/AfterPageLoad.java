@@ -13,8 +13,8 @@ import java.lang.annotation.Target;
  * by anottating a method with this annotation.
  *
  * @author beothorn
- * @see webGrude.Browser#open(Class, String...)
- * @see webGrude.Browser#open(String, Class, String...)
+ * @see webGrude.Browser#get(Class, String...)
+ * @see webGrude.Browser#get(String, Class, String...)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
