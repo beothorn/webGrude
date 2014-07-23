@@ -12,7 +12,7 @@ import webGrude.annotations.Selector;
 
 import java.util.List;
 
-public class PirateBayExample {
+public class PirateBay {
 
     @Page("http://thepiratebay.se/search/{0}/0/7/0")
     public static class SearchResult {
@@ -20,7 +20,7 @@ public class PirateBayExample {
     }
 
     public static void main(String... args){
-        Browser.open(SearchResult.class, "ubuntu iso").magnets.forEach(s -> System.out.println(s));
+        Browser.get(SearchResult.class, "ubuntu iso").magnets.forEach(System.out::println);
     }
 
 }

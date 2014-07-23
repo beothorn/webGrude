@@ -2,7 +2,6 @@ package webGrude;
 
 import webGrude.annotations.Page;
 import webGrude.annotations.Selector;
-
 import java.util.List;
 
 public class PirateBayExample {

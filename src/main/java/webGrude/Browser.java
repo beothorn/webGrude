@@ -38,20 +38,20 @@ import com.google.common.reflect.TypeToken;
  * To load a class 
  * that is annotated as <i>{@literal @}Page("http://www.example.com")</i><br>
  * <pre>
- * {@code ExamplePage example = Browser.open(ExamplePage.class);};
+ * {@code ExamplePage example = Browser.get(ExamplePage.class);};
  * </pre>
  * <br>
  * To load a class 
  * that is annotated as <i>{@literal @}Page</i> with another url<br>
  * <pre>
- * {@code ExamplePage example = Browser.open("www.foo.bar", ExamplePage.class);};
+ * {@code ExamplePage example = Browser.get("www.foo.bar", ExamplePage.class);};
  * </pre>
  * <br>
  * To load a class 
  * that is annotated with 
  * a parameterized annotation {@code @Page("http://www.example.com/?name={0}&page={1}")}
  * <pre>
- * {@code ExamplePage example = Browser.open(ExamplePage.class, "john", "1");}
+ * {@code ExamplePage example = Browser.get(ExamplePage.class, "john", "1");}
  * </pre>
  * @author beothorn
  * @see webGrude.annotations.Page
