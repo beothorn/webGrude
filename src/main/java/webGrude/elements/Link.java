@@ -68,7 +68,7 @@ public class Link<T> {
      * @return an instance of visitingType 
      */
 	public T visit(){
-		return Browser.open(getLinkUrl(), type);
+		return Browser.get(getLinkUrl(), type);
 	}
 
 }

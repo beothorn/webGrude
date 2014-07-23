@@ -13,7 +13,7 @@ public class PirateBayExample {
     }
 
     public static void main(String... args){
-        SearchResult tpb = Browser.open(SearchResult.class, "ubuntu iso");
+        SearchResult tpb = Browser.get(SearchResult.class, "ubuntu iso");
         for (String magnetLink : tpb.magnets){
             System.out.println(magnetLink);
         }

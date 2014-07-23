@@ -10,10 +10,10 @@ import webGrude.http.BrowserClient;
 public class BrowserTest {
 
     @Test
-    public void test(){
+    public void testMappingFromResource(){
 
         final String fooUrl = Foo.class.getResource("Foo.html").toString();
-        final Foo foo = Browser.open(fooUrl,Foo.class);
+        final Foo foo = Browser.get(fooUrl,Foo.class);
 
         assertEquals("Title",foo.someContent.title);
         assertEquals("Lorem ipsum",foo.someContent.text);
@@ -55,7 +55,7 @@ public class BrowserTest {
         Browser.setWebClient(new BrowserClient(){
             public String get(String get){return "DUMMY";}
         });
-        Browser.open(PageWithParameterizedURL.class,"x","y");
+        Browser.get(PageWithParameterizedURL.class,"x","y");
         assertEquals("http://www.foo.com/x/bar/y/baz",Browser.getCurentUrl());
     }
 

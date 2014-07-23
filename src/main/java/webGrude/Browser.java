@@ -61,7 +61,7 @@ public class Browser {
 
     private static BrowserClient webClient;
     private static String currentPageUrl;
-    private static String currentPage;
+    private static String currentPageContents;
 
     /**
      *  Loads content from url onto an instance of pageClass.
@@ -74,42 +74,16 @@ public class Browser {
      * {@literal @}Selector annotation populated.
      */
     public static <T> T get(final Class<T> pageClass,final String... params) {
-        return open(pageClass, params);
+    	cryIfNotAnnotated(pageClass);
+        try {
+                final String pageUrl = pageClass.getAnnotation(Page.class).value();
+                return loadPage(pageUrl, pageClass, params);
+        } catch (final Exception e) {
+                throw new RuntimeException(e);
+        }
     }
-
-    /**
-     *  Loads content from url onto an instance of pageClass.
-     *  Same as get.
-     *
-     * @param <T> A instance of the class with a {@literal @}Page annotantion
-     * @param pageClass A class with a {@literal @}Page annotantion
-     * @param params Optional, if the pageClass has a url with parameters
-     * @return The class instantiated and with the fields with the
-     * {@literal @}Selector annotation populated.
-     */
-    public static <T> T open(final Class<T> pageClass,final String... params) {
-            cryIfNotAnnotated(pageClass);
-            try {
-                    final String pageUrl = pageClass.getAnnotation(Page.class).value();
-                    return loadPage(pageUrl, pageClass, params);
-            } catch (final Exception e) {
-                    throw new RuntimeException(e);
-            }
-    }
-
-    public static String getCurentUrl() {
-        return currentPageUrl;
-    }
-
-    public static String getCurentPage() {
-        return currentPage;
-    }
-
-    public static void setWebClient(final BrowserClient client) {
-        webClient = client;
-    }
-
-    public static <T> T open(final String pageUrl, final Class<T> pageClass, final String... params) {
+    
+    public static <T> T get(final String pageUrl, final Class<T> pageClass, final String... params) {
 		cryIfNotAnnotated(pageClass);
 		try {
 			return loadPage(pageUrl, pageClass, params);
@@ -118,9 +92,21 @@ public class Browser {
 		}
 	}
 
+    public static String getCurentUrl() {
+        return currentPageUrl;
+    }
+
+    public static String getCurentPageContents() {
+        return currentPageContents;
+    }
+
+    public static void setWebClient(final BrowserClient client) {
+        webClient = client;
+    }
+
 	private static <T> void cryIfNotAnnotated(final Class<T> pageClass) {
 		if (!pageClass.isAnnotationPresent(Page.class))
-			throw new RuntimeException("Ops, you forgot to add the @" + Page.class.getSimpleName());
+			throw new RuntimeException("To be mapped from a page, the class must be annotated  @" + Page.class.getSimpleName());
 	}
 
     private static String loadPage(String pageUrl, final String... params){
@@ -146,7 +132,7 @@ public class Browser {
 			parse = Jsoup.parse(new File(url.getPath()), "UTF-8");
 		} else {
 			final String page = loadPage(Browser.currentPageUrl);
-            currentPage = page;
+            currentPageContents = page;
 			parse = Jsoup.parse(page);
 		}
 
