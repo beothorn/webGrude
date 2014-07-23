@@ -1,13 +1,11 @@
 package webGrude;
 
-import org.apache.http.client.ClientProtocolException;
-import org.junit.Test;
-import webGrude.http.BrowserClient;
-
-import java.io.IOException;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
+import webGrude.http.BrowserClient;
 
 public class BrowserTest {
 
@@ -20,7 +18,7 @@ public class BrowserTest {
         assertEquals("Title",foo.someContent.title);
         assertEquals("Lorem ipsum",foo.someContent.text);
 
-        assertEquals("Nested content Title",foo.someNestedContent.header);
+        assertEquals("Nested content Title",foo.someNestedContent.getHeader());
         assertEquals("Nested content",foo.someNestedContent.content);
 
         assertEquals(2,foo.section.someRepeatingContent.size());
@@ -44,10 +42,10 @@ public class BrowserTest {
 
         assertEquals(0,foo.doesNotExist.size());
 
-        assertEquals(42,foo.i);
-        assertEquals(42.24,foo.f,0.001);
+        assertEquals(42,foo.getIntValue());
+        assertEquals(42.24,foo.getFloatValue(),0.001);
         assertEquals(3.1415,foo.fHref,0.00001);
-        assertTrue(foo.b);
+        assertTrue(foo.getBoolValue());
 
         assertEquals(41,foo.afterLoadValue);
     }

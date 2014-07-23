@@ -202,6 +202,7 @@ public class Browser {
 		final Element selectedNode = getFirstOrNullOrCryIfMoreThanOne(node, cssQuery);
         if(selectedNode == null) return;
 		final Document innerHtml = Jsoup.parse(selectedNode.html());
+		f.setAccessible(true);
 		f.set(newInstance, loadDomContents(innerHtml, fieldClass));
 	}
 
@@ -234,10 +235,12 @@ public class Browser {
 
         if (Instantiator.typeIsVisitable(fieldClass)) {
             final Class<?> visitableGenericClass = TypeToken.of(f.getGenericType()).resolveType(Link.class.getTypeParameters()[0]).getRawType();
+            f.setAccessible(true);
             f.set(newInstance, Instantiator.visitableForNode(selectedNode, visitableGenericClass, Browser.currentPageUrl));
         }else{
             if (typeIsKnown(fieldClass)) {
                 final String attribute = selectorAnnotation.attr();
+                f.setAccessible(true);
                 f.set(newInstance, instanceForNode(selectedNode, attribute, fieldClass));
 			} else {
 				throw new RuntimeException("Can't convert html to class " + fieldClass.getName() + "\n" +
@@ -262,9 +265,11 @@ public class Browser {
 
         Type type = ((ParameterizedType) genericType).getActualTypeArguments()[0];
         if(type instanceof ParameterizedType){
+        	f.setAccessible(true);
             f.set(newInstance, populateListOfLinks(nodes, attribute, (ParameterizedType)type));
         }else{
             final Class<?> listClass = (Class<?>) type;
+            f.setAccessible(true);
             f.set(newInstance, populateList(nodes, attribute, listClass));
         }
 	}
@@ -278,6 +283,7 @@ public class Browser {
 			final String cssQuery = selectorAnnotation.value();
             final String attribute = selectorAnnotation.attr();
 			final Elements nodes = node.select(cssQuery);
+			f.setAccessible(true);
 			f.set(newInstance, populateList(nodes, attribute, listClass));
 		}
 	}

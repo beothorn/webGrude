@@ -19,13 +19,16 @@ public class Foo {
     }
 
     @Selector("#some-content") static public class SomeContent {
-            @Selector("h1") public String title;
+            @Selector("h1")  public String title;
             @Selector("div") public String text;
     }
 
     @Selector("#some-nested-content") static public class SomeNestedContent {
-            @Selector("h1") public String header;
-            @Selector("span") public String content;
+            @Selector("h1")   private String header;
+            @Selector("span") public  String content;
+			public String getHeader() {
+				return header;
+			}
     }
 
     @Selector("#section") static public class Section {
@@ -33,16 +36,16 @@ public class Foo {
             public SomeNestedContent someNestedContent;
     }
 
-    @Selector("#html-content") public Element htmlContent;
-    @Selector("p a") public Link<Foo> nextPage;
-    @Selector(value = "#links a",attr = "href") public List<String> linksWithHref;
-    @Selector(value = "#linkList a",attr = "href") public List<Link<Foo>> linkList;
-    @Selector(".doesNotExist") public List<String> doesNotExist;
+    @Selector(value = "#links a",     attr = "href")   public List<String> linksWithHref;
+    @Selector(value = "#linkList a",  attr = "href")   public List<Link<Foo>> linkList;
+    @Selector("#html-content")                         public Element htmlContent;
+    @Selector("p a")                                   public Link<Foo> nextPage;
+    @Selector(".doesNotExist")                         public List<String> doesNotExist;
     @Selector(".some-repeating-content-outside-a-tag") public List<SomeRepeatingContent> repeatingContentsNoSurroundingTag;
 
-    @Selector("#float") public float f;
-    @Selector("#integer") public int i;
-    @Selector("#boolean") public boolean b;
+    @Selector("#float")   private float floatValue;
+    @Selector("#integer") private int intValue;
+    @Selector("#boolean") private boolean boolValue;
 
     @Selector(value = "#numberOnAnAttribute", attr = "href") public float fHref;
 
@@ -54,7 +57,18 @@ public class Foo {
 
     @AfterPageLoad
     public void copyIntegerMinusOne(){
-        afterLoadValue = i - 1;
+        afterLoadValue = getIntValue() - 1;
     }
+
+	public float getFloatValue() {
+		return floatValue;
+	}
+	public int getIntValue() {
+		return intValue;
+	}
+
+	public boolean getBoolValue() {
+		return boolValue;
+	}
 
 }
