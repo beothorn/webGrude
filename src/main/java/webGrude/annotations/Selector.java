@@ -45,8 +45,8 @@ import java.lang.annotation.Target;
  * @author beothorn
  * @see webGrude.annotations.Page
  * @see webGrude.elements.Link
- * @see webGrude.Browser#open(String, Class, String...)
- * @see webGrude.Browser#open(Class, String...)
+ * @see webGrude.Browser#get(String, Class, String...)
+ * @see webGrude.Browser#get(Class, String...)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD})
