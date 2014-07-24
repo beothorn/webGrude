@@ -3,18 +3,19 @@ package webGrude;
 import static webGrude.elements.Instantiator.instanceForNode;
 import static webGrude.elements.Instantiator.typeIsKnown;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.*;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.http.client.ClientProtocolException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -26,6 +27,7 @@ import webGrude.annotations.Selector;
 import webGrude.elements.Instantiator;
 import webGrude.elements.Link;
 import webGrude.http.BrowserClient;
+import webGrude.http.GetException;
 import webGrude.http.SimpleHttpClientImpl;
 
 import com.google.common.reflect.TypeToken;
@@ -64,13 +66,14 @@ public class Browser {
     private static String currentPageContents;
 
     /**
-     *  Loads content from url onto an instance of pageClass.
+     *  Loads content from url from the Page annotation on pageClass onto an instance of pageClass.
      *
      * @param <T> A instance of the class with a {@literal @}Page annotantion
      * @param pageClass A class with a {@literal @}Page annotantion
      * @param params Optional, if the pageClass has a url with parameters
      * @return The class instantiated and with the fields with the
      * {@literal @}Selector annotation populated.
+     * @throws webGrude.http.GetException When calling get on the BrowserClient raises an exception 
      */
     public static <T> T get(final Class<T> pageClass,final String... params) {
     	cryIfNotAnnotated(pageClass);
@@ -81,14 +84,21 @@ public class Browser {
                 throw new RuntimeException(e);
         }
     }
-    
+    /***
+     * 
+     * Loads content from given url onto an instance of pageClass.
+     * 
+     * @param <T> A instance of the class with a {@literal @}Page annotantion
+     * @param pageUrl
+     * @param pageClass A class with a {@literal @}Page annotantion
+     * @param params Optional, if the pageClass has a url with parameters
+     * @return The class instantiated and with the fields with the
+     * {@literal @}Selector annotation populated.
+     * @throws webGrude.http.GetException When calling get on the BrowserClient raises an exception 
+     */
     public static <T> T get(final String pageUrl, final Class<T> pageClass, final String... params) {
 		cryIfNotAnnotated(pageClass);
-		try {
-			return loadPage(pageUrl, pageClass, params);
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
-		}
+		return loadPage(pageUrl, pageClass, params);
 	}
 
     public static String getCurentUrl() {
@@ -111,29 +121,31 @@ public class Browser {
     private static String loadPage(String pageUrl, final String... params){
         if(webClient == null)
             setWebClient(new SimpleHttpClientImpl());
-        return webClient.get(pageUrl);
+        try{
+        	return webClient.get(pageUrl);
+        }catch(Exception e){
+        	throw new GetException(e, pageUrl);
+        }
     }
 
-	private static <T> T loadPage(final String pageUrl, final Class<T> pageClass, final String... params) throws MalformedURLException, IOException, ClientProtocolException,  IllegalAccessException {
+	private static <T> T loadPage(final String pageUrl, final Class<T> pageClass, final String... params){
 
         String[] formattedParams = new String[params.length];
 
         for(int i = 0 ; i < params.length; i++){
-            formattedParams[i] = URLEncoder.encode(params[i],"UTF-8");
+            try {
+				formattedParams[i] = URLEncoder.encode(params[i],"UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				throw new RuntimeException(e);
+			}
         }
 
         Browser.currentPageUrl = MessageFormat.format(pageUrl, formattedParams);
 
-		final URL url = new URL(Browser.currentPageUrl);
-		final String protocol = url.getProtocol();
 		final Document parse;
-		if (protocol.equals("file")) {
-			parse = Jsoup.parse(new File(url.getPath()), "UTF-8");
-		} else {
-			final String page = loadPage(Browser.currentPageUrl);
-            currentPageContents = page;
-			parse = Jsoup.parse(page);
-		}
+		final String page = loadPage(Browser.currentPageUrl);
+        currentPageContents = page;
+		parse = Jsoup.parse(page);
 
         T t = loadDomContents(parse, pageClass);
 
@@ -144,7 +156,11 @@ public class Browser {
                     declaredMethod.invoke(t);
                 } catch (InvocationTargetException e) {
                     throw new RuntimeException(e);
-                }
+                } catch (IllegalAccessException e) {
+                	throw new RuntimeException(e);
+				} catch (IllegalArgumentException e) {
+					throw new RuntimeException(e);
+				}
             }
         }
         return t;

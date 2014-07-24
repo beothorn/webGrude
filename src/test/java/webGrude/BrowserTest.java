@@ -3,9 +3,11 @@ package webGrude;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import webGrude.http.BrowserClient;
+import webGrude.http.GetException;
 
 public class BrowserTest {
 
@@ -53,10 +55,26 @@ public class BrowserTest {
     @Test
     public void testUrlSubstitution(){
         Browser.setWebClient(new BrowserClient(){
-            public String get(String get){return "DUMMY";}
+            public String get(String url){return "DUMMY";}
         });
         Browser.get(PageWithParameterizedURL.class,"x","y");
         assertEquals("http://www.foo.com/x/bar/y/baz",Browser.getCurentUrl());
+    }
+    
+    @Test
+    public void testUriInvalidFormat(){
+    	try{
+    		Browser.get("jnnkljbnkjb",Foo.class);
+    		Assert.fail("Should have thrown GetException");
+    	}catch(GetException e){}
+    }
+    
+    @Test
+    public void testUriNotAccessible(){
+    	try{
+    		Browser.get("www.thisurldoesnotexis.bla.blabla",Foo.class);
+    		Assert.fail("Should have thrown GetException");
+    	}catch(GetException e){}
     }
 
 }
