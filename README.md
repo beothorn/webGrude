@@ -1,7 +1,7 @@
 WebGrude
 =========
 
-WebGrude is a java library for mapping a html to a java class through annotations with css selectors.
+WebGrude is a java library for mapping a html to a java class through annotations with css selectors.  
 For example, this is a pirate bay search that prints the resulting magnet links:
 
 ```java
@@ -16,11 +16,15 @@ public class PirateBay {
 
     @Page("http://thepiratebay.se/search/{0}/0/7/0")
     public static class SearchResult {
-        @Selector(value = "#searchResult tbody tr td a[href*=magnet]", attr = "href") public List<String> magnets;
+        @Selector(value = "#searchResult tbody tr td a[href*=magnet]", attr = "href")
+        public List<String> magnets;
     }
 
     public static void main(String... args){
-        Browser.get(SearchResult.class, "ubuntu iso").magnets.forEach(System.out::println);
+        Browser
+            .get(SearchResult.class, "ubuntu iso")
+            .magnets
+            .forEach(System.out::println);
     }
 
 }
@@ -35,7 +39,7 @@ Maven dependency
 <dependency>
   <groupId>com.github.beothorn</groupId>
   <artifactId>webGrude</artifactId>
-  <version>0.0.4</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 
