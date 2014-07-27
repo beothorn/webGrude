@@ -43,11 +43,13 @@ import java.lang.annotation.Target;
  * <pre>
  * {@code @Selector(value = "#foo", attr="href") String fooText;}
  * </pre>
+ * <p>
  * A field mapping a the inner html code of a link with id foo
  * </p>
  * <pre>
  * {@code @Selector(value = "#foo", attr="html") String fooHtml;}
  * </pre>
+ * <p>
  * A field mapping a the outer html code of a link with id foo
  * </p>
  * <pre>
