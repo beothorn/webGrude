@@ -18,7 +18,8 @@ import java.util.List;
 public class PirateBay {
 
     public static void main(String[] args) {
-        PirateBay search = PirateBay.search("ubuntu");//Search calls Browser, which loads the page on a PirateBay instance
+        //Search calls Browser, which loads the page on a PirateBay instance
+        PirateBay search = PirateBay.search("ubuntu");
         while(search!=null){
         	search.magnets.forEach(System.out::println);
         	search = search.nextPage();
