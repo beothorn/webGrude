@@ -68,9 +68,12 @@ Maven dependency
 </dependency>
 ```
 
-Resources
+Useful links
 =========
 
-A blog post with a more in depth example on how to use webgrude http://www.isageek.com.br/2014/06/web-scraping-on-java-with-webgrude.html
-Reference on jsoup Selector http://jsoup.org/apidocs/org/jsoup/select/Selector.html  
-Try jsoup online http://try.jsoup.org/
+A blog post with a more in depth example on how to use webgrude  
+    - http://www.isageek.com.br/2014/06/web-scraping-on-java-with-webgrude.html  
+Reference on jsoup Selector  
+    - http://jsoup.org/apidocs/org/jsoup/select/Selector.html   
+Try jsoup online   
+    - http://try.jsoup.org/
