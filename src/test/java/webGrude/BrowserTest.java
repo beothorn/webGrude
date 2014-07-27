@@ -32,6 +32,9 @@ public class BrowserTest {
         assertEquals("bar2 baz2",foo.section.someRepeatingContent.get(1));
 
         assertEquals("<p> Get content as <br /> element </p>",foo.htmlContent.html());
+        
+        assertEquals("<a href=\"linkToBeExtracted1\">Some useless text</a> \n<a href=\"linkToBeExtracted2\">Some useless text</a>",foo.linksInnerHtml);
+        assertEquals("<a href=\"./page2\">link to next page</a>",foo.linksOuterHtml);
 
         assertEquals("linkToBeExtracted1",foo.linksWithHref.get(0));
         assertEquals("linkToBeExtracted2",foo.linksWithHref.get(1));

@@ -35,10 +35,17 @@ public class Instantiator {
 	        if(c.equals(Element.class))
 	            return (T) node;
 	
-	        if(attribute != null && !attribute.isEmpty())
-	            value = node.attr(attribute);
-	        else
+	        if(attribute != null && !attribute.isEmpty()){
+	        	if(attribute.equals("html")){
+	        		value = node.html();
+	        	}else if(attribute.equals("outerHtml")){
+	        		value = node.outerHtml();
+	        	}else{
+	        		value = node.attr(attribute);
+	        	}
+	        }else{
 	            value = node.text();
+	        }
 	
 	        if(c.equals(String.class))
 	            return (T) value;

@@ -46,6 +46,9 @@ public class Foo {
     @Selector("#float")   private float floatValue;
     @Selector("#integer") private int intValue;
     @Selector("#boolean") private boolean boolValue;
+    
+    @Selector(value="#links",attr="html") public String linksInnerHtml;
+    @Selector(value="p>a",attr="outerHtml") public String linksOuterHtml;
 
     @Selector(value = "#numberOnAnAttribute", attr = "href") public float fHref;
 
