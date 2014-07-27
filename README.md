@@ -17,15 +17,32 @@ import java.util.List;
 @Page("http://thepiratebay.se/search/{0}/0/7/0")
 public class PirateBay {
 
+    public static void main(String[] args) {
+        PirateBay search = PirateBay.search("ubuntu");//Search calls Browser, which loads the page on a PirateBay instance
+        while(search!=null){
+        	search.magnets.forEach(System.out::println);
+        	search = search.nextPage();
+        }
+    }
+
     public static PirateBay search(String term){
         return Browser.get(PirateBay.class, term);
     }
 
     private PirateBay(){}
 
+    /*
+    * This selector matches all magnet links. The result is added to this String list.
+    * The default behaviour is to use the rendered html inside the matched tag, but here
+    * we want to use the href value instead.
+    */
     @Selector(value = "#searchResult tbody tr td a[href*=magnet]", attr = "href")
     public List<String> magnets;
     
+    /*
+    * This selctor matches a link to the next page result, wich can be mapped to a PirateBay instance.
+    * The Link next gets the page on the href attribute of the link when method visit is called.
+    */
     @Selector("a:has(img[alt=Next])")
     private Link<PirateBay> next;
     
@@ -34,15 +51,6 @@ public class PirateBay {
     		return null;
     	return next.visit();
     }
-    
-    public static void main(String[] args) {
-        PirateBay search = PirateBay.search("ubuntu");
-        while(search!=null){
-        	search.magnets.forEach(System.out::println);
-        	search = search.nextPage();
-        }
-    }
-
 }
 ```
 
