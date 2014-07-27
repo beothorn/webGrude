@@ -6,8 +6,12 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Assert;
 import org.junit.Test;
 
+import webGrude.elements.WrongTypeForField;
 import webGrude.http.BrowserClient;
 import webGrude.http.GetException;
+import webGrude.mappables.Foo;
+import webGrude.mappables.TooManyResultsError;
+import webGrude.mappables.WrongTypeError;
 
 public class BrowserTest {
 
@@ -75,6 +79,24 @@ public class BrowserTest {
     		Browser.get("www.thisurldoesnotexis.bla.blabla",Foo.class);
     		Assert.fail("Should have thrown GetException");
     	}catch(GetException e){}
+    }
+    
+    @Test
+    public void tooManyResults(){
+    	try{
+    		final String fooUrl = Foo.class.getResource("Foo.html").toString();
+            Browser.get(fooUrl,TooManyResultsError.class);
+    		Assert.fail("Should have thrown GetException");
+    	}catch(TooManyResultsException e){}
+    }
+    
+    @Test
+    public void testWrongType(){
+    	try{
+    		final String fooUrl = Foo.class.getResource("Foo.html").toString();
+            WrongTypeError wrongTypeError = Browser.get(fooUrl,WrongTypeError.class);
+    		Assert.fail("Should have thrown GetException, and wrong value is "+wrongTypeError.badFloat);
+    	}catch(WrongTypeForField e){}
     }
 
 }

@@ -1,4 +1,4 @@
-package webGrude;
+package webGrude.mappables;
 
 import java.util.List;
 

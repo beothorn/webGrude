@@ -26,6 +26,7 @@ import webGrude.annotations.Page;
 import webGrude.annotations.Selector;
 import webGrude.elements.Instantiator;
 import webGrude.elements.Link;
+import webGrude.elements.WrongTypeForField;
 import webGrude.http.BrowserClient;
 import webGrude.http.GetException;
 import webGrude.http.SimpleHttpClientImpl;
@@ -94,7 +95,9 @@ public class Browser {
      * @param params Optional, if the pageClass has a url with parameters
      * @return The class instantiated and with the fields with the
      * {@literal @}Selector annotation populated.
-     * @throws webGrude.http.GetException When calling get on the BrowserClient raises an exception 
+     * @throws webGrude.http.GetException When calling get on the BrowserClient raises an exception
+     * @throws webGrude.elements.WrongTypeForField When a field have a type incompatible with the page html, example a <p>foo</p> on a float field
+     * @throws webGrude.TooManyResultsException When a field maps to a type but the css selector returns more than one element
      */
     public static <T> T get(final String pageUrl, final Class<T> pageClass, final String... params) {
 		cryIfNotAnnotated(pageClass);
@@ -140,7 +143,7 @@ public class Browser {
 			}
         }
 
-        Browser.currentPageUrl = MessageFormat.format(pageUrl, formattedParams);
+        Browser.currentPageUrl = MessageFormat.format(pageUrl, (Object[])formattedParams);
 
 		final Document parse;
 		final String page = loadPage(Browser.currentPageUrl);
@@ -169,7 +172,11 @@ public class Browser {
 	private static <T> T loadDomContents(final Element node, final Class<T> classs){
 		try {
 			return internalLoadDomContents(node, classs);
-		} catch (Exception e) {
+		}catch (TooManyResultsException e) {
+			throw e;
+		}catch (WrongTypeForField e) {
+			throw e;
+		}catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -219,7 +226,7 @@ public class Browser {
 		final Elements elements = node.select(cssQuery);
 		final int size = elements.size();
 		if(size > 1){
-			throw new RuntimeException("The query '"+cssQuery+"' should return one result but returned "+size+". For more than one result a list should be used as the field type.");
+			throw new TooManyResultsException(cssQuery, size);
 		}
         if(size == 0){
             return null;
@@ -317,7 +324,8 @@ public class Browser {
         while (iterator.hasNext()) {
             final Element node = iterator.next();
             Class<?> classs = (Class<?>) paraType.getActualTypeArguments()[0];
-            Link<T> link = (Link<T>) Instantiator.visitableForNode(node, classs, Browser.currentPageUrl);
+            @SuppressWarnings("unchecked")
+			Link<T> link = (Link<T>) Instantiator.visitableForNode(node, classs, Browser.currentPageUrl);
             newInstanceList.add(link);
         }
         return newInstanceList;

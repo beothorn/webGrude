@@ -29,24 +29,28 @@ public class Instantiator {
 
 	@SuppressWarnings("unchecked")
     public static <T> T instanceForNode(final Element node, String attribute, final Class<T> c){
-        if(c.equals(Element.class))
-            return (T) node;
-
-        String value;
-
-        if(attribute != null && !attribute.isEmpty())
-            value = node.attr(attribute);
-        else
-            value = node.text();
-
-        if(c.equals(String.class))
-            return (T) value;
-        if(c.equals(Integer.class) || c.getSimpleName().equals("int"))
-            return (T) Integer.valueOf(value);
-        if(c.equals(Float.class) || c.getSimpleName().equals("float"))
-            return (T) Float.valueOf(value);
-        if(c.equals(Boolean.class) || c.getSimpleName().equals("boolean"))
-            return (T) Boolean.valueOf(value);
+		String value;
+		
+		try{
+	        if(c.equals(Element.class))
+	            return (T) node;
+	
+	        if(attribute != null && !attribute.isEmpty())
+	            value = node.attr(attribute);
+	        else
+	            value = node.text();
+	
+	        if(c.equals(String.class))
+	            return (T) value;
+	        if(c.equals(Integer.class) || c.getSimpleName().equals("int"))
+	            return (T) Integer.valueOf(value);
+	        if(c.equals(Float.class) || c.getSimpleName().equals("float"))
+	            return (T) Float.valueOf(value);
+	        if(c.equals(Boolean.class) || c.getSimpleName().equals("boolean"))
+	            return (T) Boolean.valueOf(value);
+		}catch(Exception e){
+			throw new WrongTypeForField(node,attribute,c,e);
+		}
 
         return (T) value;
     }
