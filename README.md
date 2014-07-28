@@ -2,7 +2,8 @@ WebGrude
 =========
 
 WebGrude is a java library for mapping a html to a java class through annotations with css selectors.  
-For example, this is a pirate bay search that prints the resulting magnet links:
+
+This is a pirate bay search that prints the resulting magnet links:
 
 ```java
 package www;
