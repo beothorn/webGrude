@@ -41,7 +41,7 @@ public class PirateBay {
     public List<String> magnets;
     
     /*
-    * This selctor matches a link to the next page result, wich can be mapped to a PirateBay instance.
+    * This selector matches a link to the next page result, wich can be mapped to a PirateBay instance.
     * The Link next gets the page on the href attribute of the link when method visit is called.
     */
     @Selector("a:has(img[alt=Next])")
