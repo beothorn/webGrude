@@ -56,7 +56,7 @@ public class PirateBay {
 }
 ```
 
-For more complex use cases check see src/test/java/webGrude/BrowserTest.java
+For more complex use cases check src/test/java/webGrude/BrowserTest.java
 
 Maven dependency
 =========
