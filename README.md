@@ -3,10 +3,8 @@ WebGrude
 
   WebGrude is a java library for mapping a html to a java class through annotations with css selectors.  
 
-  To use it add the @Page annotation on a class and annotate each field corresponding to a website value with a css selector,  
-then call Browser.get to intantiate it.  
-  You can write the url from where the values should be loaded from on the @Page annotation or call Browser.get passing  
-the url as the first parameter. Also, it is possible to use tokens on your url and pass parameters to replace these tokens on Browser.get.  
+  To use it add the @Page annotation on a class and annotate each field corresponding to a website value with a css selector, then call Browser.get to intantiate it.  
+  You can write the url from where the values should be loaded from on the @Page annotation or call Browser.get passing the url as the first parameter. Also, it is possible to use tokens on your url and pass parameters to replace these tokens on Browser.get.  
 
   Webgrude tries to cast the values from the html to the field types. 
 The supported types are:
