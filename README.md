@@ -17,7 +17,7 @@ The supported types are:
 - webGrude.elements.Link<>  : A Link must be loaded from a tag containing a href attribute. Link has a method visit, which loads and returns an instance of the declared generic type.
 - org.jsoup.nodes.Element : See http://jsoup.org/apidocs/org/jsoup/nodes/Element.html
 
-  If a value can't an WrongTypeForField is thrown. This can be usefull when writing automated test that expects a certain value on a generated page.
+  If a value can't be casted an WrongTypeForField is thrown. This can be usefull when writing automated test that expects a certain value on a generated page.
 
 Maven dependency
 =========
