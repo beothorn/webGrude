@@ -8,7 +8,7 @@ WebGrude
 
   Webgrude tries to cast the values from the html to the field types. 
 The supported types are:
-- String
+- String : By default, the html text value is used on the field. It is possible to use an attribute value by passing a attr parameter to the @Selector annotation. 'html' and 'outerHtml' can also be used as attr value.
 - int
 - float
 - boolean
