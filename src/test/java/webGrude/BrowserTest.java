@@ -3,6 +3,7 @@ package webGrude;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.apache.http.message.BasicNameValuePair;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -63,6 +64,10 @@ public class BrowserTest {
     public void testUrlSubstitution(){
         Browser.setWebClient(new BrowserClient(){
             public String get(String url){return "DUMMY";}
+
+			public String post(String post, BasicNameValuePair... params) {
+				return "DUMMY";
+			}
         });
         Browser.get(PageWithParameterizedURL.class,"x","y");
         assertEquals("http://www.foo.com/x/bar/y/baz",Browser.getCurentUrl());

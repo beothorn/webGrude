@@ -19,6 +19,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 
 public class SimpleHttpClientImpl implements BrowserClient {
 
@@ -70,7 +71,12 @@ public class SimpleHttpClientImpl implements BrowserClient {
                 .setUri(get.toURI())
                 .setHeader("User-Agent", userAgent)
                 .build();
-        CloseableHttpResponse execute = httpclient.execute(request);
+        return executeRequest(request);
+	}
+
+	private String executeRequest(HttpUriRequest request) throws IOException,
+			ClientProtocolException {
+		CloseableHttpResponse execute = httpclient.execute(request);
         final HttpEntity entity =  execute.getEntity();
         final InputStream contentIS = entity.getContent();
         final Header contentType = entity.getContentType();
@@ -86,6 +92,25 @@ public class SimpleHttpClientImpl implements BrowserClient {
         final String content = IOUtils.toString(contentIS,encoding);
         contentIS.close();
         return content;
+	}
+
+	public String post(String post, BasicNameValuePair... params){
+		try {
+			return internalPost(post, params);
+		} catch (ClientProtocolException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private String internalPost(String post, BasicNameValuePair... params)
+			throws IOException, ClientProtocolException {
+		HttpUriRequest request = RequestBuilder.post().
+				addParameters(params).setUri(post).
+				setHeader("User-Agent", userAgent)
+				.build();
+		return executeRequest(request);
 	}
 
 }
