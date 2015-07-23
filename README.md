@@ -32,6 +32,19 @@ Maven dependency
 
 Examples
 =========
+Hacker news first page articles  
+```java
+@Page("https://news.ycombinator.com/")
+public class HackerNews {
+	
+	@Selector(".deadmark + a") List<String> newsTitles;
+	
+	public static void main(String[] args) {
+		HackerNews hackerNews = Browser.get(HackerNews.class);
+		hackerNews.newsTitles.forEach(System.out::println);
+	}
+}
+```
 
 This is a pirate bay search that prints the resulting magnet links:
 
