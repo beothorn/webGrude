@@ -40,8 +40,7 @@ public class HackerNews {
 	@Selector(".deadmark + a") List<String> newsTitles;
 	
 	public static void main(String[] args) {
-		HackerNews hackerNews = Browser.get(HackerNews.class);
-		hackerNews.newsTitles.forEach(System.out::println);
+		Browser.get(HackerNews.class).newsTitles.forEach(System.out::println);
 	}
 }
 ```
