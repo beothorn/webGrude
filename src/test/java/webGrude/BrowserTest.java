@@ -1,7 +1,6 @@
 package webGrude;
 
 import org.apache.http.message.BasicNameValuePair;
-import org.junit.Assert;
 import org.junit.Test;
 import webGrude.elements.WrongTypeForField;
 import webGrude.http.BrowserClient;
@@ -15,11 +14,11 @@ import static org.junit.Assert.assertTrue;
 
 public class BrowserTest {
 
+    private static final String RESOURCE_URL = Foo.class.getResource("Foo.html").toString();
+
     @Test
     public void testMappingFromResource() {
-
-        final String fooUrl = Foo.class.getResource("Foo.html").toString();
-        final Foo foo = Browser.get(fooUrl, Foo.class);
+        final Foo foo = Browser.get(RESOURCE_URL, Foo.class);
 
         assertEquals("Title", foo.someContent.title);
         assertEquals("Lorem ipsum", foo.someContent.text);
@@ -31,7 +30,7 @@ public class BrowserTest {
         assertEquals("bar baz", foo.section.someRepeatingContent.get(0));
         assertEquals("bar2 baz2", foo.section.someRepeatingContent.get(1));
 
-        assertEquals("<p> Get content as <br /> element </p>", foo.htmlContent.html());
+        assertEquals("<p> Get content as <br> element </p>", foo.htmlContent.html());
 
         assertEquals("<a href=\"linkToBeExtracted1\">Some useless text</a> \n<a href=\"linkToBeExtracted2\">Some useless text</a>", foo.linksInnerHtml);
         assertEquals("<a href=\"./page2\">link to next page</a>", foo.linksOuterHtml);
@@ -39,10 +38,10 @@ public class BrowserTest {
         assertEquals("linkToBeExtracted1", foo.linksWithHref.get(0));
         assertEquals("linkToBeExtracted2", foo.linksWithHref.get(1));
 
-        assertEquals(fooUrl + "/./page2", foo.nextPage.getLinkUrl());
+        assertEquals(RESOURCE_URL + "/./page2", foo.nextPage.getLinkUrl());
 
         assertEquals("www.example.com", foo.linkList.get(0).getLinkUrl());
-        assertEquals(fooUrl + "/./page3", foo.linkList.get(1).getLinkUrl());
+        assertEquals(RESOURCE_URL + "/./page3", foo.linkList.get(1).getLinkUrl());
 
         assertEquals("HEAD1", foo.repeatingContentsNoSurroundingTag.get(0).head);
         assertEquals("TAIL1", foo.repeatingContentsNoSurroundingTag.get(0).tail);
@@ -74,42 +73,24 @@ public class BrowserTest {
         assertEquals("http://www.foo.com/x/bar/y/baz", Browser.getCurentUrl());
     }
 
-    @Test
+    @Test(expected = GetException.class)
     public void testUriInvalidFormat() {
-        try {
-            Browser.get("jnnkljbnkjb", Foo.class);
-            Assert.fail("Should have thrown GetException");
-        } catch (GetException e) {
-        }
+        Browser.get("jnnkljbnkjb", Foo.class);
     }
 
-    @Test
+    @Test(expected = GetException.class)
     public void testUriNotAccessible() {
-        try {
-            Browser.get("www.thisurldoesnotexis.bla.blabla", Foo.class);
-            Assert.fail("Should have thrown GetException");
-        } catch (GetException e) {
-        }
+        Browser.get("www.thisurldoesnotexis.bla.blabla", Foo.class);
     }
 
-    @Test
+    @Test(expected = TooManyResultsException.class)
     public void tooManyResults() {
-        try {
-            final String fooUrl = Foo.class.getResource("Foo.html").toString();
-            Browser.get(fooUrl, TooManyResultsError.class);
-            Assert.fail("Should have thrown GetException");
-        } catch (TooManyResultsException e) {
-        }
+        Browser.get(RESOURCE_URL, TooManyResultsError.class);
     }
 
-    @Test
+    @Test(expected = WrongTypeForField.class)
     public void testWrongType() {
-        try {
-            final String fooUrl = Foo.class.getResource("Foo.html").toString();
-            WrongTypeError wrongTypeError = Browser.get(fooUrl, WrongTypeError.class);
-            Assert.fail("Should have thrown GetException, and wrong value is " + wrongTypeError.badFloat);
-        } catch (WrongTypeForField e) {
-        }
+        Browser.get(RESOURCE_URL, WrongTypeError.class);
     }
 
 }
