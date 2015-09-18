@@ -9,8 +9,8 @@ import java.lang.annotation.Target;
  * Annotates a class to be mapped to a html.
  * <p>
  * A class with this annotation can be opened by the  webgrude Browser.
- * It's value is supposed to be the url that will be mapped to this class. 
- * The Value is optional, it's possible to load other url using the Browser 
+ * It's value is supposed to be the url that will be mapped to this class.
+ * The Value is optional, it's possible to load other url using the Browser
  * with this same class.<br>
  * It's also possible to parameterize the url using the tokens {0}, {2}, ...
  * </p>
@@ -30,6 +30,7 @@ import java.lang.annotation.Target;
  * <pre>
  * {@code @Page}
  * </pre>
+ *
  * @author beothorn
  * @see webGrude.Browser#get(Class, String...)
  * @see webGrude.Browser#get(String, Class, String...)
@@ -37,5 +38,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Page {
-	String value() default "";
-} 
+    String value() default "";
+}

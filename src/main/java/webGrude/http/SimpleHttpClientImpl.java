@@ -23,94 +23,92 @@ import org.apache.http.message.BasicNameValuePair;
 
 public class SimpleHttpClientImpl implements BrowserClient {
 
-	private final CloseableHttpClient httpclient;
-	private String userAgent= "Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.13) Gecko/20101206 Ubuntu/10.10 (maverick) Firefox/3.6.13";
+    private final CloseableHttpClient httpclient;
+    private String userAgent = "Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.13) Gecko/20101206 Ubuntu/10.10 (maverick) Firefox/3.6.13";
 
-	public SimpleHttpClientImpl() {
-		httpclient = HttpClients.createDefault();
-	}
-	
-	public String getUserAgent() {
-		return userAgent;
-	}
+    public SimpleHttpClientImpl() {
+        httpclient = HttpClients.createDefault();
+    }
 
-	public void setUserAgent(String userAgent) {
-		this.userAgent = userAgent;
-	}
+    public String getUserAgent() {
+        return userAgent;
+    }
 
-	public String get(final String get){
-		
-		URL url;
-		try {
-			url = new URL(get);
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		}
-		
-		if (url.getProtocol().equalsIgnoreCase("file")) {
-			try {
-				final FileInputStream fileInputStream = new FileInputStream(new File(url.getPath()));
-				return IOUtils.toString(fileInputStream, "UTF-8");
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		try {
-			return internalGet(url);
-		} catch (ClientProtocolException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} catch (URISyntaxException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    public void setUserAgent(String userAgent) {
+        this.userAgent = userAgent;
+    }
 
-	private String internalGet(final URL get) throws IOException, ClientProtocolException, URISyntaxException {
-		HttpUriRequest request = RequestBuilder.get()
+    public String get(final String get) {
+
+        URL url;
+        try {
+            url = new URL(get);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (url.getProtocol().equalsIgnoreCase("file")) {
+            try {
+                final FileInputStream fileInputStream = new FileInputStream(new File(url.getPath()));
+                return IOUtils.toString(fileInputStream, "UTF-8");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        try {
+            return internalGet(url);
+        } catch (ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String internalGet(final URL get) throws IOException, URISyntaxException {
+        HttpUriRequest request = RequestBuilder.get()
                 .setUri(get.toURI())
                 .setHeader("User-Agent", userAgent)
                 .build();
         return executeRequest(request);
-	}
+    }
 
-	private String executeRequest(HttpUriRequest request) throws IOException,
-			ClientProtocolException {
-		CloseableHttpResponse execute = httpclient.execute(request);
-        final HttpEntity entity =  execute.getEntity();
+    private String executeRequest(HttpUriRequest request) throws IOException {
+        CloseableHttpResponse execute = httpclient.execute(request);
+        final HttpEntity entity = execute.getEntity();
         final InputStream contentIS = entity.getContent();
         final Header contentType = entity.getContentType();
         final HeaderElement[] elements = contentType.getElements();
         final HeaderElement headerElement = elements[0];
         final NameValuePair parameterByName = headerElement.getParameterByName("charset");
         String encoding = "UTF-8";
-        if(parameterByName != null)
+        if (parameterByName != null)
             encoding = parameterByName.getValue();
-        if(encoding != null  && encoding.equals("ISO-8859-1")){
+        if (encoding != null && encoding.equals("ISO-8859-1")) {
             encoding = "CP1252";
         }
-        final String content = IOUtils.toString(contentIS,encoding);
+        final String content = IOUtils.toString(contentIS, encoding);
         contentIS.close();
         return content;
-	}
+    }
 
-	public String post(String post, BasicNameValuePair... params){
-		try {
-			return internalPost(post, params);
-		} catch (ClientProtocolException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    public String post(String post, BasicNameValuePair... params) {
+        try {
+            return internalPost(post, params);
+        } catch (ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-	private String internalPost(String post, BasicNameValuePair... params)
-			throws IOException, ClientProtocolException {
-		HttpUriRequest request = RequestBuilder.post().
-				addParameters(params).setUri(post).
-				setHeader("User-Agent", userAgent)
-				.build();
-		return executeRequest(request);
-	}
+    private String internalPost(String post, BasicNameValuePair... params) throws IOException {
+        HttpUriRequest request = RequestBuilder.post().
+                addParameters(params).setUri(post).
+                setHeader("User-Agent", userAgent)
+                .build();
+        return executeRequest(request);
+    }
 
 }

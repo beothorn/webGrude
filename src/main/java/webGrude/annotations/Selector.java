@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
  * </ul>
  * Or a List of any of these types.<br>
  * You can also set the field as an attribute value instead of it's text using
- * the attr annotation value. html and outerHtml are also valid values for attr. 
+ * the attr annotation value. html and outerHtml are also valid values for attr.
  * For example:
  * <p>
  * A field mapping a link with id foo
@@ -55,6 +55,7 @@ import java.lang.annotation.Target;
  * <pre>
  * {@code @Selector(value = "#foo", attr="outerHtml") String fooOuterHtml;}
  * </pre>
+ *
  * @author beothorn
  * @see webGrude.annotations.Page
  * @see webGrude.elements.Link
@@ -64,6 +65,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD})
 public @interface Selector {
-	String value();
+
+    String value();
+
     String attr() default "";
-} 
+}
