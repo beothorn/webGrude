@@ -1,6 +1,11 @@
 package webGrude;
 
+import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
+import com.google.common.io.ByteStreams;
 import org.apache.http.message.BasicNameValuePair;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import webGrude.elements.WrongTypeForField;
 import webGrude.http.BrowserClient;
@@ -9,16 +14,37 @@ import webGrude.mappables.Foo;
 import webGrude.mappables.TooManyResultsError;
 import webGrude.mappables.WrongTypeError;
 
+import java.io.InputStream;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class BrowserTest {
 
-    private static final String RESOURCE_URL = Foo.class.getResource("Foo.html").toString();
+    @ClassRule
+    public static WireMockClassRule wireMockRule = new WireMockClassRule(48089);
+
+    private static final String HTTP_URL = "http://localhost:48089/Foo.html";
+
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        try (final InputStream is = Foo.class.getResourceAsStream("Foo.html")) {
+        stubFor(get(urlEqualTo("/Foo.html"))
+            .willReturn(aResponse()
+                    .withHeader("Content-Type", "text/html;encoding=UTF-8")
+                    .withBody(ByteStreams.toByteArray(is))));
+        }
+    }
+
+    @AfterClass
+    public static void afterClass() throws Exception {
+        wireMockRule.shutdown();
+    }
 
     @Test
     public void testMappingFromResource() {
-        final Foo foo = Browser.get(RESOURCE_URL, Foo.class);
+        final Foo foo = Browser.get(HTTP_URL, Foo.class);
 
         assertEquals("Title", foo.someContent.title);
         assertEquals("Lorem ipsum", foo.someContent.text);
@@ -38,10 +64,10 @@ public class BrowserTest {
         assertEquals("linkToBeExtracted1", foo.linksWithHref.get(0));
         assertEquals("linkToBeExtracted2", foo.linksWithHref.get(1));
 
-        assertEquals(RESOURCE_URL + "/./page2", foo.nextPage.getLinkUrl());
+        assertEquals(HTTP_URL + "/./page2", foo.nextPage.getLinkUrl());
 
         assertEquals("www.example.com", foo.linkList.get(0).getLinkUrl());
-        assertEquals(RESOURCE_URL + "/./page3", foo.linkList.get(1).getLinkUrl());
+        assertEquals(HTTP_URL + "/./page3", foo.linkList.get(1).getLinkUrl());
 
         assertEquals("HEAD1", foo.repeatingContentsNoSurroundingTag.get(0).head);
         assertEquals("TAIL1", foo.repeatingContentsNoSurroundingTag.get(0).tail);
@@ -85,12 +111,12 @@ public class BrowserTest {
 
     @Test(expected = TooManyResultsException.class)
     public void tooManyResults() {
-        Browser.get(RESOURCE_URL, TooManyResultsError.class);
+        Browser.get(HTTP_URL, TooManyResultsError.class);
     }
 
     @Test(expected = WrongTypeForField.class)
     public void testWrongType() {
-        Browser.get(RESOURCE_URL, WrongTypeError.class);
+        Browser.get(HTTP_URL, WrongTypeError.class);
     }
 
 }
