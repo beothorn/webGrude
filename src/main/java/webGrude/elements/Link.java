@@ -49,9 +49,8 @@ public class Link<T> {
     }
 
     public String getLinkUrl() {
-        String urlToVisit;
         final String href = hrefElement.attr("href");
-        urlToVisit = href;
+        String urlToVisit = href;
         if (href.startsWith("/")) {
             final String rootPage = currentPageUrl.replaceAll("(.*://.*?/).*", "$1");
             urlToVisit = rootPage.substring(0, rootPage.length() - 1) + href;

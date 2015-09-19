@@ -72,7 +72,7 @@ public class SimpleHttpClientImpl implements BrowserClient {
         }
     }
 
-    public String post(String post, BasicNameValuePair... params) {
+    public String post(final String post, final BasicNameValuePair... params) {
         try {
             return internalPost(post, params);
         } catch (IOException e) {
@@ -80,10 +80,10 @@ public class SimpleHttpClientImpl implements BrowserClient {
         }
     }
 
-    private String internalPost(String post, BasicNameValuePair... params) throws IOException {
+    private String internalPost(final String post, final BasicNameValuePair... params) throws IOException {
         final HttpUriRequest request = RequestBuilder.post()
-                .addParameters(params)
                 .setUri(post)
+                .addParameters(params)
                 .setHeader("User-Agent", userAgent)
                 .build();
         return executeRequest(request);

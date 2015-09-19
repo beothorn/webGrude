@@ -1,26 +1,10 @@
 package webGrude;
 
-import static webGrude.elements.Instantiator.instanceForNode;
-import static webGrude.elements.Instantiator.typeIsKnown;
-
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.net.URLEncoder;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
+import com.google.common.reflect.TypeToken;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import webGrude.annotations.AfterPageLoad;
 import webGrude.annotations.Page;
 import webGrude.annotations.Selector;
@@ -31,7 +15,15 @@ import webGrude.http.BrowserClient;
 import webGrude.http.GetException;
 import webGrude.http.SimpleHttpClientImpl;
 
-import com.google.common.reflect.TypeToken;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.*;
+import java.net.URLEncoder;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+
+import static webGrude.elements.Instantiator.instanceForNode;
+import static webGrude.elements.Instantiator.typeIsKnown;
 
 /**
  * Instantiate a class with Page annotations from a web page or a html file.
@@ -170,31 +162,28 @@ public class Browser {
         return t;
     }
 
-    private static <T> T loadDomContents(final Element node, final Class<T> classs) {
+    private static <T> T loadDomContents(final Element node, final Class<T> clazz) {
         try {
-            return internalLoadDomContents(node, classs);
-        } catch (TooManyResultsException e) {
-            throw e;
-        } catch (WrongTypeForField e) {
+            return internalLoadDomContents(node, clazz);
+        } catch (TooManyResultsException | WrongTypeForField e) {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static <T> T internalLoadDomContents(final Element node,
-                                                 final Class<T> classs) throws NoSuchMethodException,
-            InstantiationException, IllegalAccessException,
-            InvocationTargetException {
-        Constructor<T> constructor;
-        constructor = classs.getDeclaredConstructor();
+    private static <T> T internalLoadDomContents(final Element node, final Class<T> clazz)
+            throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+    {
+        final Constructor<T> constructor = clazz.getDeclaredConstructor();
         constructor.setAccessible(true);
         final T newInstance = constructor.newInstance();
 
-        if (classs.getAnnotation(Selector.class) == null && classs.getAnnotation(Page.class) == null)
+        if (clazz.getAnnotation(Selector.class) == null && clazz.getAnnotation(Page.class) == null) {
             return newInstance;
+        }
 
-        final Field[] declaredFields = classs.getDeclaredFields();
+        final Field[] declaredFields = clazz.getDeclaredFields();
         for (final Field f : declaredFields) {
             final Class<?> fieldClass = f.getType();
 
@@ -214,7 +203,10 @@ public class Browser {
         return newInstance;
     }
 
-    private static <T> void solveUnanotatedFieldOfAnnotatedType(final Element node, final T newInstance, final Field f, final Class<?> fieldClass) throws IllegalAccessException, InstantiationException {
+    private static <T> void solveUnanotatedFieldOfAnnotatedType(final Element node, final T newInstance,
+                                                                final Field f, final Class<?> fieldClass)
+            throws IllegalAccessException, InstantiationException
+    {
         final String cssQuery = fieldClass.getAnnotation(Selector.class).value();
         final Element selectedNode = getFirstOrNullOrCryIfMoreThanOne(node, cssQuery);
         if (selectedNode == null) return;
@@ -232,11 +224,13 @@ public class Browser {
         if (size == 0) {
             return null;
         }
-        final Element selectedNode = elements.first();
-        return selectedNode;
+        return elements.first();
     }
 
-    private static <T> void solveAnnotatedField(final Element node, final T newInstance, final Field f, final Class<?> fieldClass) throws IllegalAccessException, InstantiationException {
+    private static <T> void solveAnnotatedField(final Element node, final T newInstance,
+                                                final Field f, final Class<?> fieldClass)
+            throws IllegalAccessException, InstantiationException
+    {
         if (fieldClass.equals(java.util.List.class)) {
             solveAnnotatedListField(node, newInstance, f);
         } else {
@@ -244,7 +238,10 @@ public class Browser {
         }
     }
 
-    private static <T> void solveAnnotatedFieldWithMappableType(final Element node, final T newInstance, final Field f, final Class<?> fieldClass) throws IllegalAccessException {
+    private static <T> void solveAnnotatedFieldWithMappableType(final Element node, final T newInstance,
+                                                                final Field f, final Class<?> fieldClass)
+            throws IllegalAccessException
+    {
         final Selector selectorAnnotation = f.getAnnotation(Selector.class);
         final String cssQuery = selectorAnnotation.value();
         final Element selectedNode = getFirstOrNullOrCryIfMoreThanOne(node, cssQuery);
@@ -274,13 +271,14 @@ public class Browser {
         }
     }
 
-    private static <T> void solveAnnotatedListField(final Element node, final T newInstance, final Field f) throws IllegalAccessException, InstantiationException {
+    private static <T> void solveAnnotatedListField(final Element node, final T newInstance, final Field f)
+            throws IllegalAccessException, InstantiationException
+    {
         final Type genericType = f.getGenericType();
         final String cssQuery = f.getAnnotation(Selector.class).value();
         final String attribute = f.getAnnotation(Selector.class).attr();
         final Elements nodes = node.select(cssQuery);
-
-        Type type = ((ParameterizedType) genericType).getActualTypeArguments()[0];
+        final Type type = ((ParameterizedType) genericType).getActualTypeArguments()[0];
         if (type instanceof ParameterizedType) {
             f.setAccessible(true);
             f.set(newInstance, populateListOfLinks(nodes, attribute, (ParameterizedType) type));
@@ -291,10 +289,11 @@ public class Browser {
         }
     }
 
-    private static <T> void solveListOfAnnotatedType(final Element node, final T newInstance, final Field f) throws IllegalAccessException, InstantiationException {
+    private static <T> void solveListOfAnnotatedType(final Element node, final T newInstance, final Field f)
+            throws IllegalAccessException, InstantiationException
+    {
         final Type genericType = f.getGenericType();
         final Class<?> listClass = (Class<?>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
-
         final Selector selectorAnnotation = listClass.getAnnotation(Selector.class);
         if (selectorAnnotation != null) {
             final String cssQuery = selectorAnnotation.value();
@@ -305,28 +304,28 @@ public class Browser {
         }
     }
 
-    private static <T> List<T> populateList(final Elements nodes, String attribute, final Class<T> classs) throws InstantiationException, IllegalAccessException {
+    private static <T> List<T> populateList(final Elements nodes, String attribute, final Class<T> clazz)
+            throws InstantiationException, IllegalAccessException
+    {
         final ArrayList<T> newInstanceList = new ArrayList<T>();
-        final Iterator<Element> iterator = nodes.iterator();
-        while (iterator.hasNext()) {
-            final Element node = iterator.next();
-            if (typeIsKnown(classs)) {
-                newInstanceList.add(instanceForNode(node, attribute, classs));
+        for (final Element node : nodes) {
+            if (typeIsKnown(clazz)) {
+                newInstanceList.add(instanceForNode(node, attribute, clazz));
             } else {
-                newInstanceList.add(loadDomContents(node, classs));
+                newInstanceList.add(loadDomContents(node, clazz));
             }
         }
         return newInstanceList;
     }
 
-    private static <T> ArrayList<Link<T>> populateListOfLinks(final Elements nodes, String attribute, final ParameterizedType paraType) throws InstantiationException, IllegalAccessException {
+    private static <T> ArrayList<Link<T>> populateListOfLinks(final Elements nodes, String attribute, final ParameterizedType paraType)
+            throws InstantiationException, IllegalAccessException
+    {
         final ArrayList<Link<T>> newInstanceList = new ArrayList<Link<T>>();
-        final Iterator<Element> iterator = nodes.iterator();
-        while (iterator.hasNext()) {
-            final Element node = iterator.next();
-            Class<?> classs = (Class<?>) paraType.getActualTypeArguments()[0];
+        for (final Element node : nodes) {
+            final Class<?> clazz = (Class<?>) paraType.getActualTypeArguments()[0];
             @SuppressWarnings("unchecked")
-            Link<T> link = Instantiator.visitableForNode(node, classs, Browser.currentPageUrl);
+            final Link<T> link = Instantiator.visitableForNode(node, clazz, Browser.currentPageUrl);
             newInstanceList.add(link);
         }
         return newInstanceList;

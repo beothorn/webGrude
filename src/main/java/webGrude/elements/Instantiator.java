@@ -16,7 +16,7 @@ public class Instantiator {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T instanceForNode(final Element node, String attribute, final Class<T> c) {
+    public static <T> T instanceForNode(final Element node, final String attribute, final Class<T> c) {
         String value;
 
         try {
