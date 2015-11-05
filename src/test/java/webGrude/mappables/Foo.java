@@ -1,13 +1,12 @@
 package webGrude.mappables;
 
-import java.util.List;
-
 import org.jsoup.nodes.Element;
-
 import webGrude.annotations.AfterPageLoad;
 import webGrude.annotations.Page;
 import webGrude.annotations.Selector;
 import webGrude.elements.Link;
+
+import java.util.List;
 
 @Page
 public class Foo {
@@ -19,21 +18,21 @@ public class Foo {
     }
 
     @Selector("#some-content") static public class SomeContent {
-            @Selector("h1")  public String title;
-            @Selector("div") public String text;
+        @Selector("h1")  public String title;
+        @Selector("div") public String text;
     }
 
     @Selector("#some-nested-content") static public class SomeNestedContent {
-            @Selector("h1")   private String header;
-            @Selector("span") public  String content;
-			public String getHeader() {
-				return header;
-			}
+        @Selector("h1")   private String header;
+        @Selector("span") public  String content;
+        public String getHeader() {
+            return header;
+        }
     }
 
     @Selector("#section") static public class Section {
-            @Selector(".some-repeating-content") public List<String> someRepeatingContent;
-            public SomeNestedContent someNestedContent;
+        @Selector(".some-repeating-content") public List<String> someRepeatingContent;
+        public SomeNestedContent someNestedContent;
     }
 
     @Selector(value = "#links a",     attr = "href")   public List<String> linksWithHref;
@@ -46,7 +45,7 @@ public class Foo {
     @Selector("#float")   private float floatValue;
     @Selector("#integer") private int intValue;
     @Selector("#boolean") private boolean boolValue;
-    
+
     @Selector(value="#links",attr="html") public String linksInnerHtml;
     @Selector(value="p>a",attr="outerHtml") public String linksOuterHtml;
 
@@ -57,7 +56,7 @@ public class Foo {
     public Section section;
 
     public int afterLoadValue;
-    
+
     private Foo(){}
 
     @AfterPageLoad
@@ -65,14 +64,14 @@ public class Foo {
         afterLoadValue = getIntValue() - 1;
     }
 
-	public float getFloatValue() {
+    public float getFloatValue() {
 		return floatValue;
 	}
-	public int getIntValue() {
+    public int getIntValue() {
 		return intValue;
 	}
 
-	public boolean getBoolValue() {
+    public boolean getBoolValue() {
 		return boolValue;
 	}
 
