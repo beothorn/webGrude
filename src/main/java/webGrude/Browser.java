@@ -324,7 +324,6 @@ public class Browser {
         final ArrayList<Link<T>> newInstanceList = new ArrayList<Link<T>>();
         for (final Element node : nodes) {
             final Class<?> clazz = (Class<?>) paraType.getActualTypeArguments()[0];
-            @SuppressWarnings("unchecked")
             final Link<T> link = Instantiator.visitableForNode(node, clazz, Browser.currentPageUrl);
             newInstanceList.add(link);
         }
