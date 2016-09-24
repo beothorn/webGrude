@@ -2,6 +2,7 @@ WebGrude
 =========
 
   WebGrude is a java library for mapping a html to a java class through annotations with css selectors.  
+  It is suited for scraping pages that are generated server side and have a repeating structure.  
 
   To use it add the @Page annotation on a class and annotate each field corresponding to a website value with a css selector, then call Browser.get to intantiate it.  
   
