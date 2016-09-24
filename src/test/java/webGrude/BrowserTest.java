@@ -1,24 +1,29 @@
 package webGrude;
 
-import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
-import com.google.common.io.ByteStreams;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.io.InputStream;
+
 import org.apache.http.message.BasicNameValuePair;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+
+import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
+import com.google.common.io.ByteStreams;
+
 import webGrude.elements.WrongTypeForField;
 import webGrude.http.BrowserClient;
 import webGrude.http.GetException;
 import webGrude.mappables.Foo;
 import webGrude.mappables.TooManyResultsError;
 import webGrude.mappables.WrongTypeError;
-
-import java.io.InputStream;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class BrowserTest {
 
@@ -87,11 +92,13 @@ public class BrowserTest {
     @Test
     public void testUrlSubstitution() {
         Browser.setWebClient(new BrowserClient() {
-            public String get(String url) {
+            @Override
+            public String get(final String url) {
                 return "DUMMY";
             }
 
-            public String post(String post, BasicNameValuePair... params) {
+            @Override
+            public String post(final String post, final BasicNameValuePair... params) {
                 return "DUMMY";
             }
         });

@@ -49,14 +49,14 @@ public class Link<T> {
     }
 
     public String getLinkUrl() {
-        final String href = hrefElement.attr("href");
+        final String href = this.hrefElement.attr("href");
         String urlToVisit = href;
         if (href.startsWith("/")) {
-            final String rootPage = currentPageUrl.replaceAll("(.*://.*?/).*", "$1");
+            final String rootPage = this.currentPageUrl.replaceAll("(.*://.*?/).*", "$1");
             urlToVisit = rootPage.substring(0, rootPage.length() - 1) + href;
         }
         if (href.startsWith(".")) {
-            urlToVisit = currentPageUrl + "/" + href;
+            urlToVisit = this.currentPageUrl + "/" + href;
         }
         return urlToVisit;
     }
@@ -67,7 +67,7 @@ public class Link<T> {
      * @return an instance of visitingType
      */
     public T visit() {
-        return Browser.get(getLinkUrl(), type);
+        return Browser.get(this.getLinkUrl(), this.type);
     }
 
 }
