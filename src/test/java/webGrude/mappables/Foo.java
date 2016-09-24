@@ -1,5 +1,6 @@
 package webGrude.mappables;
 
+import java.util.Date;
 import java.util.List;
 
 import org.jsoup.nodes.Element;
@@ -47,14 +48,16 @@ public class Foo {
     @Selector("#integer") private int intValueWithRegex;
     @Selector("#boolean") private boolean boolValue;
 
-    @Selector(value ="#integer-from-string-with-regex", regex = "([0-9]*) comments") private int intValue;
-    @Selector(value = "#numberOnAnAttributeRegex", attr = "href", regex = "pi is ([0-9\\.]*)") public float fHrefRegex;
+    @Selector(value ="#integer-from-string-with-regex", format = "([0-9]*) comments") private int intValue;
+    @Selector(value = "#numberOnAnAttributeRegex", attr = "href", format = "pi is ([0-9\\.]*)") public float fHrefRegex;
 
 
     @Selector(value="#links",attr="html") public String linksInnerHtml;
     @Selector(value="p>a",attr="outerHtml") public String linksOuterHtml;
 
     @Selector(value = "#numberOnAnAttribute", attr = "href") public float fHref;
+
+    @Selector(value = "#date", format ="MMMM dd, yyyy - h:mm a", attr = "title", locale = "en_US") public Date date;
 
     public SomeContent someContent;
     public SomeNestedContent someNestedContent;

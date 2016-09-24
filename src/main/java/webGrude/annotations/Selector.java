@@ -65,8 +65,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD})
 public @interface Selector {
-    String NOREGEX = "[unassigned]";
+    String NOVALUE = "[unassigned]";
     String value();
     String attr() default "";
-    String regex() default NOREGEX;
+    String format() default NOVALUE;
+    String locale() default NOVALUE;
 }

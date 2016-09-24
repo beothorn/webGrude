@@ -14,6 +14,7 @@ import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -285,10 +286,8 @@ public class Browser {
         }
 
         if (typeIsKnown(fieldClass)) {
-            final String attribute = selectorAnnotation.attr();
-            final String regex = selectorAnnotation.regex();
             f.setAccessible(true);
-            f.set(newInstance, instanceForNode(selectedNode, attribute, regex, fieldClass));
+            f.set(newInstance, instanceForNode(selectedNode, selectorAnnotation, fieldClass));
             return;
         }
 
@@ -300,7 +299,8 @@ public class Browser {
                 Float.class.getCanonicalName() + "\n" +
                 Boolean.class.getCanonicalName() + "\n" +
                 Link.class.getCanonicalName() + "\n" +
-                Element.class.getCanonicalName() + "\n"
+                Element.class.getCanonicalName() + "\n"+
+                Date.class.getCanonicalName() + "\n"
         );
     }
 
@@ -310,20 +310,19 @@ public class Browser {
         final Field f
     ) throws IllegalAccessException, InstantiationException {
         final Type genericType = f.getGenericType();
-        final String cssQuery = f.getAnnotation(Selector.class).value();
-        final String attribute = f.getAnnotation(Selector.class).attr();
-        final String regex = f.getAnnotation(Selector.class).regex();
+        final Selector selector = f.getAnnotation(Selector.class);
+        final String cssQuery = selector.value();
         final Elements nodes = node.select(cssQuery);
         final Type type = ((ParameterizedType) genericType).getActualTypeArguments()[0];
         if (type instanceof ParameterizedType) {
             f.setAccessible(true);
-            f.set(newInstance, populateListOfLinks(nodes, attribute, (ParameterizedType) type));
+            f.set(newInstance, populateListOfLinks(nodes, (ParameterizedType) type));
             return;
         }
 
         final Class<?> listClass = (Class<?>) type;
         f.setAccessible(true);
-        f.set(newInstance, populateList(nodes, attribute, regex, listClass));
+        f.set(newInstance, populateList(nodes, selector, listClass));
     }
 
     private static <T> void solveListOfAnnotatedType(
@@ -337,23 +336,20 @@ public class Browser {
         if (selectorAnnotation == null) return;
 
         final String cssQuery = selectorAnnotation.value();
-        final String attribute = selectorAnnotation.attr();
-        final String regex = selectorAnnotation.regex();
         final Elements nodes = node.select(cssQuery);
         f.setAccessible(true);
-        f.set(newInstance, populateList(nodes, attribute, regex, listClass));
+        f.set(newInstance, populateList(nodes, selectorAnnotation, listClass));
     }
 
     private static <T> List<T> populateList(
         final Elements nodes,
-        final String attribute,
-        final String regex,
+        final Selector selector,
         final Class<T> clazz
     ) throws InstantiationException, IllegalAccessException {
         final ArrayList<T> newInstanceList = new ArrayList<>();
         for (final Element node : nodes) {
             if (typeIsKnown(clazz)) {
-                newInstanceList.add(instanceForNode(node, attribute, regex, clazz));
+                newInstanceList.add(instanceForNode(node, selector, clazz));
             } else {
                 newInstanceList.add(loadDomContents(node, clazz));
             }
@@ -363,7 +359,6 @@ public class Browser {
 
     private static <T> ArrayList<Link<T>> populateListOfLinks(
         final Elements nodes,
-        final String attribute,
         final ParameterizedType paraType
     ) throws InstantiationException, IllegalAccessException {
         final ArrayList<Link<T>> newInstanceList = new ArrayList<>();
