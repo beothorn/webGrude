@@ -70,4 +70,5 @@ public @interface Selector {
     String attr() default "";
     String format() default NOVALUE;
     String locale() default NOVALUE;
+    String defValue() default NOVALUE;
 }

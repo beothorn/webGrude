@@ -49,6 +49,7 @@ public class Foo {
     @Selector("#boolean") private boolean boolValue;
 
     @Selector(value ="#integer-from-string-with-regex", format = "([0-9]*) comments") private int intValue;
+    @Selector(value ="#integer-from-string-with-regex-with-default", format = "([0-9]*) comments", defValue="0") public int intRegexWithDefault;
     @Selector(value = "#numberOnAnAttributeRegex", attr = "href", format = "pi is ([0-9\\.]*)") public float fHrefRegex;
 
 

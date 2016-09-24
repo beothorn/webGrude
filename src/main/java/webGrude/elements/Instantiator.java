@@ -36,6 +36,7 @@ public class Instantiator {
         final String attribute = s.attr();
         final String format = s.format();
         final String locale = s.locale();
+        final String defValue = s.defValue();
 
         String value;
 
@@ -59,8 +60,15 @@ public class Instantiator {
             if(!c.equals(Date.class) && format != null && !format.equals(Selector.NOVALUE) ){
                 final Pattern p = Pattern.compile(format);
                 final Matcher matcher = p.matcher(value);
-                matcher.find();
-                value = matcher.group(1);
+                final boolean found = matcher.find();
+                if(found){
+                    value = matcher.group(1);
+                    if(value.isEmpty()){
+                        value = defValue;
+                    }
+                }else{
+                    value = defValue;
+                }
             }
 
             if (c.equals(String.class)) {
@@ -89,6 +97,7 @@ public class Instantiator {
             }
 
         } catch (final Exception e) {
+
             throw new WrongTypeForField(node, attribute, c, e);
         }
 

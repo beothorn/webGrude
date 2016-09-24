@@ -6,6 +6,8 @@ WebGrude
   To use it add the @Page annotation on a class and annotate each field corresponding to a website value with a css selector, then call Browser.get to intantiate it.  
   
   You can write the url from where the values should be loaded from on the @Page annotation or call Browser.get passing the url as the first parameter. Also, it is possible to use tokens on your url and pass parameters to replace these tokens on Browser.get.  
+  
+  You can also use regex to format the scraped value to the field type.  
 
   Webgrude tries to cast the values from the html to the field types. 
 The supported types are:
@@ -13,6 +15,7 @@ The supported types are:
 - int
 - float
 - boolean
+- Date : Use it with assigning the date format on the format field of the Selector annotation  
 - List<> : Can be a list of any supported type or a list of a class annotated with @Selector 
 - webGrude.elements.Link<>  : A Link must be loaded from a tag containing a href attribute. Link has a method visit, which loads and returns an instance of the declared generic type.
 - org.jsoup.nodes.Element : See http://jsoup.org/apidocs/org/jsoup/nodes/Element.html
@@ -43,6 +46,31 @@ public class HackerNews {
 		Browser.get(HackerNews.class).newsTitles.forEach(System.out::println);
 	}
 }
+```
+
+hackaday blog posts  
+```java
+import java.util.Date;
+import java.util.List;
+
+import webGrude.Browser;
+import webGrude.annotations.Page;
+import webGrude.annotations.Selector;
+
+@Page("http://hackaday.com/blog/") public class Hackaday {
+    @Selector("article") static class Post{
+        @Selector(".entry-title") String title;
+        @Selector(value=".comments-counts",format="([0-9]*) Comments", defValue="0") int commentsCount;
+        @Selector(value = ".entry-date a", format ="MMMM dd, yyyy - hh:mm a", attr = "title", locale = "en-US") Date date;
+        @Override public String toString() {return title+" : "+date+" , "+commentsCount+" comments";}
+    }
+    List<Post> posts;
+    public static void main(final String[] args) {
+        final Hackaday hackaday = Browser.get(Hackaday.class);
+        hackaday.posts.forEach(System.out::println);
+    }
+}
+
 ```
 
 This is a pirate bay search that prints the resulting magnet links:
