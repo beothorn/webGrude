@@ -82,8 +82,10 @@ public class BrowserTest {
         assertEquals(0, foo.doesNotExist.size());
 
         assertEquals(42, foo.getIntValue());
+        assertEquals(42, foo.getIntValueWithRegex());
         assertEquals(42.24, foo.getFloatValue(), 0.001);
         assertEquals(3.1415, foo.fHref, 0.00001);
+        assertEquals(3.1415, foo.fHrefRegex, 0.00001);
         assertTrue(foo.getBoolValue());
 
         assertEquals(41, foo.afterLoadValue);

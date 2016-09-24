@@ -1,12 +1,13 @@
 package webGrude.mappables;
 
+import java.util.List;
+
 import org.jsoup.nodes.Element;
+
 import webGrude.annotations.AfterPageLoad;
 import webGrude.annotations.Page;
 import webGrude.annotations.Selector;
 import webGrude.elements.Link;
-
-import java.util.List;
 
 @Page
 public class Foo {
@@ -43,8 +44,12 @@ public class Foo {
     @Selector(".some-repeating-content-outside-a-tag") public List<SomeRepeatingContent> repeatingContentsNoSurroundingTag;
 
     @Selector("#float")   private float floatValue;
-    @Selector("#integer") private int intValue;
+    @Selector("#integer") private int intValueWithRegex;
     @Selector("#boolean") private boolean boolValue;
+
+    @Selector(value ="#integer-from-string-with-regex", regex = "([0-9]*) comments") private int intValue;
+    @Selector(value = "#numberOnAnAttributeRegex", attr = "href", regex = "pi is ([0-9\\.]*)") public float fHrefRegex;
+
 
     @Selector(value="#links",attr="html") public String linksInnerHtml;
     @Selector(value="p>a",attr="outerHtml") public String linksOuterHtml;
@@ -65,14 +70,19 @@ public class Foo {
     }
 
     public float getFloatValue() {
-		return floatValue;
-	}
+        return floatValue;
+    }
+
     public int getIntValue() {
-		return intValue;
-	}
+        return intValue;
+    }
+
+    public int getIntValueWithRegex() {
+        return intValueWithRegex;
+    }
 
     public boolean getBoolValue() {
-		return boolValue;
-	}
+        return boolValue;
+    }
 
 }

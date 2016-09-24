@@ -286,8 +286,9 @@ public class Browser {
 
         if (typeIsKnown(fieldClass)) {
             final String attribute = selectorAnnotation.attr();
+            final String regex = selectorAnnotation.regex();
             f.setAccessible(true);
-            f.set(newInstance, instanceForNode(selectedNode, attribute, fieldClass));
+            f.set(newInstance, instanceForNode(selectedNode, attribute, regex, fieldClass));
             return;
         }
 
@@ -311,6 +312,7 @@ public class Browser {
         final Type genericType = f.getGenericType();
         final String cssQuery = f.getAnnotation(Selector.class).value();
         final String attribute = f.getAnnotation(Selector.class).attr();
+        final String regex = f.getAnnotation(Selector.class).regex();
         final Elements nodes = node.select(cssQuery);
         final Type type = ((ParameterizedType) genericType).getActualTypeArguments()[0];
         if (type instanceof ParameterizedType) {
@@ -321,7 +323,7 @@ public class Browser {
 
         final Class<?> listClass = (Class<?>) type;
         f.setAccessible(true);
-        f.set(newInstance, populateList(nodes, attribute, listClass));
+        f.set(newInstance, populateList(nodes, attribute, regex, listClass));
     }
 
     private static <T> void solveListOfAnnotatedType(
@@ -336,20 +338,22 @@ public class Browser {
 
         final String cssQuery = selectorAnnotation.value();
         final String attribute = selectorAnnotation.attr();
+        final String regex = selectorAnnotation.regex();
         final Elements nodes = node.select(cssQuery);
         f.setAccessible(true);
-        f.set(newInstance, populateList(nodes, attribute, listClass));
+        f.set(newInstance, populateList(nodes, attribute, regex, listClass));
     }
 
     private static <T> List<T> populateList(
         final Elements nodes,
         final String attribute,
+        final String regex,
         final Class<T> clazz
     ) throws InstantiationException, IllegalAccessException {
         final ArrayList<T> newInstanceList = new ArrayList<>();
         for (final Element node : nodes) {
             if (typeIsKnown(clazz)) {
-                newInstanceList.add(instanceForNode(node, attribute, clazz));
+                newInstanceList.add(instanceForNode(node, attribute, regex, clazz));
             } else {
                 newInstanceList.add(loadDomContents(node, clazz));
             }

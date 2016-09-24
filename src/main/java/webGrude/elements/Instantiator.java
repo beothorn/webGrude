@@ -1,8 +1,12 @@
 package webGrude.elements;
 
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.jsoup.nodes.Element;
 
-import java.util.List;
+import webGrude.annotations.Selector;
 
 @SuppressWarnings("rawtypes")
 public class Instantiator {
@@ -16,7 +20,12 @@ public class Instantiator {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T instanceForNode(final Element node, final String attribute, final Class<T> c) {
+    public static <T> T instanceForNode(
+        final Element node,
+        final String attribute,
+        final String regex,
+        final Class<T> c
+    ) {
         String value;
 
         try {
@@ -36,6 +45,13 @@ public class Instantiator {
                 value = node.text();
             }
 
+            if(regex != null && !regex.equals(Selector.NOREGEX) ){
+                final Pattern p = Pattern.compile(regex);
+                final Matcher matcher = p.matcher(value);
+                matcher.find();
+                value = matcher.group(1);
+            }
+
             if (c.equals(String.class)) {
                 return (T) value;
             }
@@ -52,7 +68,7 @@ public class Instantiator {
                 return (T) Boolean.valueOf(value);
             }
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new WrongTypeForField(node, attribute, c, e);
         }
 
