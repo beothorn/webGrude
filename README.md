@@ -40,8 +40,7 @@ Hacker news first page articles
 ```java
 @Page("https://news.ycombinator.com/")
 public class HackerNews {
-	
-	@Selector(".deadmark + a") List<String> newsTitles;
+	@Selector(".storylink") public List<String> newsTitles;
 }
 
 //Usage
