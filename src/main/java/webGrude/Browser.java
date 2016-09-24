@@ -195,7 +195,12 @@ public class Browser {
     private static <T> T internalLoadDomContents(final Element node, final Class<T> clazz)
             throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
     {
-        final Constructor<T> constructor = clazz.getDeclaredConstructor();
+        final Constructor<T> constructor;
+        try{
+            constructor = clazz.getDeclaredConstructor();
+        }catch(final java.lang.NoSuchMethodException e){
+            throw new RuntimeException("If your class is an inner class, perhaps you should declare 'public static class' instead of 'public class'", e);
+        }
         constructor.setAccessible(true);
         final T newInstance = constructor.newInstance();
 
