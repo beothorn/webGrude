@@ -16,7 +16,7 @@ The supported types are:
 - int
 - float
 - boolean
-- Date : Use it with assigning the date format on the format field of the Selector annotation  
+- Date : Assign the date format on the format field of the Selector annotation (See example below)  
 - List<> : Can be a list of any supported type or a list of a class annotated with @Selector 
 - webGrude.elements.Link<>  : A Link must be loaded from a tag containing a href attribute. Link has a method visit, which loads and returns an instance of the declared generic type.
 - org.jsoup.nodes.Element : See http://jsoup.org/apidocs/org/jsoup/nodes/Element.html
