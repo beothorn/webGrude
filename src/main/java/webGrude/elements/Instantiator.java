@@ -1,6 +1,7 @@
 package webGrude.elements;
 
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -89,7 +90,14 @@ public class Instantiator {
             }
 
             if (c.equals(Float.class) || c.getSimpleName().equals("float")) {
-                return (T) Float.valueOf(value);
+                if (!locale.equals(Selector.NOVALUE)) {
+                    Locale loc = LocaleUtils.toLocale(locale);
+                    final NumberFormat nf = NumberFormat.getInstance(loc);
+                    Number number = nf.parse(value);
+                    return (T) Float.valueOf(number.floatValue());
+                } else {
+                    return (T) Float.valueOf(value);
+                }
             }
 
             if (c.equals(Boolean.class) || c.getSimpleName().equals("boolean")) {
