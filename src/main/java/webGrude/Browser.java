@@ -194,7 +194,7 @@ public class Browser {
     }
 
     private static <T> T internalLoadDomContents(final Element node, final Class<T> clazz)
-            throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+            throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, IncompatibleTypes
     {
         final Constructor<T> constructor;
         try{
@@ -216,7 +216,7 @@ public class Browser {
             if (fieldClass.equals(java.util.List.class) && f.getAnnotation(Selector.class) == null) {
                 solveListOfAnnotatedType(node, newInstance, f);
             }
-            
+
             if (f.getAnnotation(Selectors.class) != null) {
                 solveRepeatableAnnotatedFieldWithMappableType(node, newInstance, f, fieldClass);
             }
@@ -263,30 +263,42 @@ public class Browser {
         }
         return elements.first();
     }
-    
+
     private static <T> void solveRepeatableAnnotatedFieldWithMappableType(
-        final Element node, 
-        final T newInstance, 
-        final Field f, 
+        final Element node,
+        final T newInstance,
+        final Field f,
         final Class<?> fieldClass
-    ) throws IllegalAccessException {
+    ) throws IncompatibleTypes {
         final Selectors selectorsAnnotation = f.getAnnotation(Selectors.class);
-        for (Selector selectorAnnotation : selectorsAnnotation.value()) {
+        for (final Selector selectorAnnotation : selectorsAnnotation.value()) {
             final String cssQuery = selectorAnnotation.value();
 
-            Element selectedNode = getFirstOrNullOrCryIfMoreThanOne(node, cssQuery);
+            final Element selectedNode = getFirstOrNullOrCryIfMoreThanOne(node, cssQuery);
             if (selectedNode == null) continue;
 
             if (Instantiator.typeIsVisitable(fieldClass)) {
                 final Class<?> visitableGenericClass = TypeToken.of(f.getGenericType()).resolveType(Link.class.getTypeParameters()[0]).getRawType();
                 f.setAccessible(true);
-                f.set(newInstance, Instantiator.visitableForNode(selectedNode, visitableGenericClass, Browser.currentPageUrl));
+                try{
+                    f.set(newInstance, Instantiator.visitableForNode(selectedNode, visitableGenericClass, Browser.currentPageUrl));
+                } catch (final IllegalAccessException e) {
+                    throw new IncompatibleTypes(newInstance, selectedNode, selectorAnnotation, fieldClass, e);
+                }
                 return;
             }
 
             if (typeIsKnown(fieldClass)) {
                 f.setAccessible(true);
-                f.set(newInstance, instanceForNode(selectedNode, selectorAnnotation, fieldClass));
+                try{
+                    f.set(newInstance, instanceForNode(
+                        selectedNode,
+                        selectorAnnotation,
+                        fieldClass
+                    ));
+                }catch(final IllegalArgumentException | IllegalAccessException e){
+                    throw new IncompatibleTypes(newInstance, selectedNode, selectorAnnotation, fieldClass, e);
+                }
                 return;
             }
 
