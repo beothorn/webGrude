@@ -83,6 +83,8 @@ public class BrowserTest {
 
         assertEquals(0, foo.doesNotExist.size());
 
+        assertEquals("[a, b]", foo.multiSelector.toString());
+
         assertEquals(42, foo.getIntValue());
         assertEquals(42, foo.getIntValueWithRegex());
         assertEquals(0, foo.intRegexWithDefault);

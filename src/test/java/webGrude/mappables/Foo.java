@@ -42,6 +42,7 @@ public class Foo {
     @Selector("#html-content")                         public Element htmlContent;
     @Selector("p a")                                   public Link<Foo> nextPage;
     @Selector(".doesNotExist")                         public List<String> doesNotExist;
+    @Selector(".multiselector,.multiselector2")        public List<String> multiSelector;
     @Selector(".some-repeating-content-outside-a-tag") public List<SomeRepeatingContent> repeatingContentsNoSurroundingTag;
 
     @Selector("#float")   private float floatValue;
