@@ -25,7 +25,7 @@ public class Foo {
     }
 
     @Selector("#some-nested-content") static public class SomeNestedContent {
-        @Selector("h1")   private String header;
+        @Selector("h0") @Selector("h1")   private String header;
         @Selector("span") public  String content;
         public String getHeader() {
             return header;
@@ -45,6 +45,7 @@ public class Foo {
     @Selector(".some-repeating-content-outside-a-tag") public List<SomeRepeatingContent> repeatingContentsNoSurroundingTag;
 
     @Selector("#float")   private float floatValue;
+    @Selector(value = "#float-european", locale = "fr_FR")   private float floatEuropeanValue;
     @Selector("#integer") private int intValueWithRegex;
     @Selector("#boolean") private boolean boolValue;
 
@@ -75,6 +76,10 @@ public class Foo {
 
     public float getFloatValue() {
         return floatValue;
+    }
+
+    public float getFloatEuropeanValue() {
+    	return floatEuropeanValue;
     }
 
     public int getIntValue() {

@@ -28,6 +28,7 @@ import com.google.common.reflect.TypeToken;
 import webGrude.annotations.AfterPageLoad;
 import webGrude.annotations.Page;
 import webGrude.annotations.Selector;
+import webGrude.annotations.Selectors;
 import webGrude.elements.Instantiator;
 import webGrude.elements.Link;
 import webGrude.elements.WrongTypeForField;
@@ -215,6 +216,10 @@ public class Browser {
             if (fieldClass.equals(java.util.List.class) && f.getAnnotation(Selector.class) == null) {
                 solveListOfAnnotatedType(node, newInstance, f);
             }
+            
+            if (f.getAnnotation(Selectors.class) != null) {
+                solveRepeatableAnnotatedFieldWithMappableType(node, newInstance, f, fieldClass);
+            }
 
             if (f.getAnnotation(Selector.class) != null) {
                 solveAnnotatedField(node, newInstance, f, fieldClass);
@@ -257,6 +262,47 @@ public class Browser {
             return null;
         }
         return elements.first();
+    }
+    
+    private static <T> void solveRepeatableAnnotatedFieldWithMappableType(
+        final Element node, 
+        final T newInstance, 
+        final Field f, 
+        final Class<?> fieldClass
+    ) throws IllegalAccessException {
+        final Selectors selectorsAnnotation = f.getAnnotation(Selectors.class);
+        for (Selector selectorAnnotation : selectorsAnnotation.value()) {
+            final String cssQuery = selectorAnnotation.value();
+
+            Element selectedNode = getFirstOrNullOrCryIfMoreThanOne(node, cssQuery);
+            if (selectedNode == null) continue;
+
+            if (Instantiator.typeIsVisitable(fieldClass)) {
+                final Class<?> visitableGenericClass = TypeToken.of(f.getGenericType()).resolveType(Link.class.getTypeParameters()[0]).getRawType();
+                f.setAccessible(true);
+                f.set(newInstance, Instantiator.visitableForNode(selectedNode, visitableGenericClass, Browser.currentPageUrl));
+                return;
+            }
+
+            if (typeIsKnown(fieldClass)) {
+                f.setAccessible(true);
+                f.set(newInstance, instanceForNode(selectedNode, selectorAnnotation, fieldClass));
+                return;
+            }
+
+            throw new RuntimeException("Can't convert html to class " + fieldClass.getName() + "\n" +
+                    "The field type must be a class with " + Page.class.getSimpleName() + " annotation or one of these types:\n" +
+                    List.class.getCanonicalName() + "\n" +
+                    String.class.getCanonicalName() + "\n" +
+                    Integer.class.getCanonicalName() + "\n" +
+                    Float.class.getCanonicalName() + "\n" +
+                    Boolean.class.getCanonicalName() + "\n" +
+                    Link.class.getCanonicalName() + "\n" +
+                    Element.class.getCanonicalName() + "\n"+
+                    Date.class.getCanonicalName() + "\n"
+            );
+        }
+
     }
 
     private static <T> void solveAnnotatedField(

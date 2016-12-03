@@ -87,6 +87,7 @@ public class BrowserTest {
         assertEquals(42, foo.getIntValueWithRegex());
         assertEquals(0, foo.intRegexWithDefault);
         assertEquals(42.24, foo.getFloatValue(), 0.001);
+        assertEquals(42.24, foo.getFloatEuropeanValue(), 0.001);
         assertEquals(3.1415, foo.fHref, 0.00001);
         assertEquals(3.1415, foo.fHrefRegex, 0.00001);
         final SimpleDateFormat df = new SimpleDateFormat("MMMM dd, yyyy - h:mm a", Locale.US);
