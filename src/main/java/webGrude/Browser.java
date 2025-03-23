@@ -22,9 +22,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
-import com.google.common.reflect.TypeToken;
-
 import webGrude.annotations.AfterPageLoad;
 import webGrude.annotations.Page;
 import webGrude.annotations.Selector;
@@ -73,7 +70,7 @@ public class Browser {
     /**
      * Loads content from url from the Page annotation on pageClass onto an instance of pageClass.
      *
-     * @param <T>       A instance of the class with a {@literal @}Page annotantion
+     * @param <T>       An instance of the class with a {@literal @}Page annotantion
      * @param pageClass A class with a {@literal @}Page annotantion
      * @param params    Optional, if the pageClass has a url with parameters
      * @return The class instantiated and with the fields with the
@@ -93,8 +90,8 @@ public class Browser {
     /***
      * Loads content from given url onto an instance of pageClass.
      *
-     * @param <T>       A instance of the class with a {@literal @}Page annotantion
-     * @param pageUrl
+     * @param <T>       An instance of the class with a {@literal @}Page annotantion
+     * @param pageUrl   The url to load.
      * @param pageClass A class with a {@literal @}Page annotantion
      * @param params    Optional, if the pageClass has a url with parameters
      * @return The class instantiated and with the fields with the
@@ -151,7 +148,6 @@ public class Browser {
 
         final String pageContents = loadPage(Browser.currentPageUrl);
         currentPageContents = pageContents;
-
 
         final Document parse = Jsoup.parse(pageContents);
 
@@ -278,14 +274,25 @@ public class Browser {
             if (selectedNode == null) continue;
 
             if (Instantiator.typeIsVisitable(fieldClass)) {
-                final Class<?> visitableGenericClass = TypeToken.of(f.getGenericType()).resolveType(Link.class.getTypeParameters()[0]).getRawType();
-                f.setAccessible(true);
-                try{
-                    f.set(newInstance, Instantiator.visitableForNode(selectedNode, visitableGenericClass, Browser.currentPageUrl));
-                } catch (final IllegalAccessException e) {
-                    throw new IncompatibleTypes(newInstance, selectedNode, selectorAnnotation, fieldClass, e);
+                Type genericType = f.getGenericType();
+
+                if (genericType instanceof ParameterizedType outerType) {
+                    Type innerType = outerType.getActualTypeArguments()[0];
+                    if (innerType instanceof ParameterizedType innerParamType) {
+                        Type deepestType = innerParamType.getActualTypeArguments()[0];
+
+                        if (deepestType instanceof Class<?> clazz) {
+                            f.setAccessible(true);
+                            try{
+                                f.set(newInstance, Instantiator.visitableForNode(selectedNode, clazz, Browser.currentPageUrl));
+                                return;
+                            } catch (final IllegalAccessException e) {
+                                throw new IncompatibleTypes(newInstance, selectedNode, selectorAnnotation, fieldClass, e);
+                            }
+                        }
+                    }
                 }
-                return;
+                throw new RuntimeException("Could not get generic for list");
             }
 
             if (typeIsKnown(fieldClass)) {
@@ -296,25 +303,29 @@ public class Browser {
                         selectorAnnotation,
                         fieldClass
                     ));
-                }catch(final IllegalArgumentException | IllegalAccessException e){
+                } catch (final IllegalArgumentException | IllegalAccessException e){
                     throw new IncompatibleTypes(newInstance, selectedNode, selectorAnnotation, fieldClass, e);
                 }
                 return;
             }
 
-            throw new RuntimeException("Can't convert html to class " + fieldClass.getName() + "\n" +
-                    "The field type must be a class with " + Page.class.getSimpleName() + " annotation or one of these types:\n" +
-                    List.class.getCanonicalName() + "\n" +
-                    String.class.getCanonicalName() + "\n" +
-                    Integer.class.getCanonicalName() + "\n" +
-                    Float.class.getCanonicalName() + "\n" +
-                    Boolean.class.getCanonicalName() + "\n" +
-                    Link.class.getCanonicalName() + "\n" +
-                    Element.class.getCanonicalName() + "\n"+
-                    Date.class.getCanonicalName() + "\n"
-            );
+            throwException(fieldClass);
         }
 
+    }
+
+    private static void throwException(Class<?> fieldClass) {
+        throw new RuntimeException("Can't convert html to class " + fieldClass.getName() + "\n" +
+                "The field type must be a class with " + Page.class.getSimpleName() + " annotation or one of these types:\n" +
+                List.class.getCanonicalName() + "\n" +
+                String.class.getCanonicalName() + "\n" +
+                Integer.class.getCanonicalName() + "\n" +
+                Float.class.getCanonicalName() + "\n" +
+                Boolean.class.getCanonicalName() + "\n" +
+                Link.class.getCanonicalName() + "\n" +
+                Element.class.getCanonicalName() + "\n"+
+                Date.class.getCanonicalName() + "\n"
+        );
     }
 
     private static <T> void solveAnnotatedField(
@@ -342,10 +353,22 @@ public class Browser {
         if (selectedNode == null) return;
 
         if (Instantiator.typeIsVisitable(fieldClass)) {
-            final Class<?> visitableGenericClass = TypeToken.of(f.getGenericType()).resolveType(Link.class.getTypeParameters()[0]).getRawType();
-            f.setAccessible(true);
-            f.set(newInstance, Instantiator.visitableForNode(selectedNode, visitableGenericClass, Browser.currentPageUrl));
-            return;
+            Type genericType = f.getGenericType();
+
+            if (genericType instanceof ParameterizedType parameterizedType) {
+                Type actualType = parameterizedType.getActualTypeArguments()[0];
+
+                if (actualType instanceof Class<?> clazz) {
+                    f.setAccessible(true);
+                    try{
+                        f.set(newInstance, Instantiator.visitableForNode(selectedNode, clazz, Browser.currentPageUrl));
+                        return;
+                    } catch (final IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+            throwException(fieldClass);
         }
 
         if (typeIsKnown(fieldClass)) {

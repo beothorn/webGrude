@@ -9,7 +9,6 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.LocaleUtils;
 import org.jsoup.nodes.Element;
 
 import webGrude.annotations.Selector;
@@ -77,10 +76,7 @@ public class Instantiator {
             }
 
             if (c.equals(Date.class)) {
-                Locale loc = Locale.getDefault();
-                if(!locale.equals(Selector.NOVALUE)){
-                    loc = LocaleUtils.toLocale(locale);
-                }
+                Locale loc = getLocale(locale);
                 final DateFormat df = new SimpleDateFormat(format, loc);
                 return (T) df.parse(value);
             }
@@ -90,14 +86,10 @@ public class Instantiator {
             }
 
             if (c.equals(Float.class) || c.getSimpleName().equals("float")) {
-                if (!locale.equals(Selector.NOVALUE)) {
-                    Locale loc = LocaleUtils.toLocale(locale);
-                    final NumberFormat nf = NumberFormat.getInstance(loc);
-                    Number number = nf.parse(value);
-                    return (T) Float.valueOf(number.floatValue());
-                } else {
-                    return (T) Float.valueOf(value);
-                }
+                Locale loc = getLocale(locale);
+                final NumberFormat nf = NumberFormat.getInstance(loc);
+                Number number = nf.parse(value);
+                return (T) Float.valueOf(number.floatValue());
             }
 
             if (c.equals(Boolean.class) || c.getSimpleName().equals("boolean")) {
@@ -110,6 +102,25 @@ public class Instantiator {
         }
 
         return (T) value;
+    }
+
+    private static Locale getLocale(String locale) {
+        Locale loc = Locale.getDefault();
+        if(!locale.equals(Selector.NOVALUE)){
+
+            if (locale.contains("_")) {
+                String[] parts = locale.split("_");
+                loc = new Locale.Builder()
+                        .setLanguage(parts[0])
+                        .setRegion(parts[1])
+                        .build();
+            } else {
+                loc = new Locale.Builder()
+                        .setLanguage(locale)
+                        .build();
+            }
+        }
+        return loc;
     }
 
     public static boolean typeIsVisitable(final Class<?> fieldClass) {

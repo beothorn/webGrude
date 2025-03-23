@@ -1,25 +1,10 @@
 package webGrude;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-
-import org.apache.http.message.BasicNameValuePair;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-
-import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
-import com.google.common.io.ByteStreams;
-
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import webGrude.elements.WrongTypeForField;
 import webGrude.http.BrowserClient;
 import webGrude.http.GetException;
@@ -27,31 +12,41 @@ import webGrude.mappables.Foo;
 import webGrude.mappables.TooManyResultsError;
 import webGrude.mappables.WrongTypeError;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 public class BrowserTest {
 
-    @ClassRule
-    public static WireMockClassRule wireMockRule = new WireMockClassRule(48089);
+    private MockWebServer mockWebServer;
 
-    private static final String HTTP_URL = "http://localhost:48089/Foo.html";
+    @BeforeEach
+    public void setup() throws IOException {
+        mockWebServer = new MockWebServer();
+        mockWebServer.start();
 
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-        try (final InputStream is = Foo.class.getResourceAsStream("Foo.html")) {
-        stubFor(get(urlEqualTo("/Foo.html"))
-            .willReturn(aResponse()
-                    .withHeader("Content-Type", "text/html;encoding=UTF-8")
-                    .withBody(ByteStreams.toByteArray(is))));
-        }
+        String body = Files.readString(Paths.get("src/test/resources/__files/Foo.html"));
+
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setHeader("Content-Type", "text/html")
+                .setBody(body));
     }
 
-    @AfterClass
-    public static void afterClass() throws Exception {
-        wireMockRule.shutdown();
+    @AfterEach
+    public void teardown() throws IOException {
+        mockWebServer.shutdown();
     }
 
     @Test
     public void testMappingFromResource() {
-        final Foo foo = Browser.get(HTTP_URL, Foo.class);
+        String url = mockWebServer.url("/foo").toString();
+        final Foo foo = Browser.get(url, Foo.class);
 
         assertEquals("Title", foo.someContent.title);
         assertEquals("Lorem ipsum", foo.someContent.text);
@@ -63,18 +58,18 @@ public class BrowserTest {
         assertEquals("bar baz", foo.section.someRepeatingContent.get(0));
         assertEquals("bar2 baz2", foo.section.someRepeatingContent.get(1));
 
-        assertEquals("<p> Get content as <br> element </p>", foo.htmlContent.html());
+        assertEquals("<p>Get content as <br>\n  element</p>", foo.htmlContent.html());
 
-        assertEquals("<a href=\"linkToBeExtracted1\">Some useless text</a> \n<a href=\"linkToBeExtracted2\">Some useless text</a>", foo.linksInnerHtml);
+        assertEquals("<a href=\"linkToBeExtracted1\">Some useless text</a> <a href=\"linkToBeExtracted2\">Some useless text</a>", foo.linksInnerHtml);
         assertEquals("<a href=\"./page2\">link to next page</a>", foo.linksOuterHtml);
 
         assertEquals("linkToBeExtracted1", foo.linksWithHref.get(0));
         assertEquals("linkToBeExtracted2", foo.linksWithHref.get(1));
 
-        assertEquals(HTTP_URL + "/./page2", foo.nextPage.getLinkUrl());
+        assertEquals(url + "/./page2", foo.nextPage.getLinkUrl());
 
         assertEquals("www.example.com", foo.linkList.get(0).getLinkUrl());
-        assertEquals(HTTP_URL + "/./page3", foo.linkList.get(1).getLinkUrl());
+        assertEquals(url + "/./page3", foo.linkList.get(1).getLinkUrl());
 
         assertEquals("HEAD1", foo.repeatingContentsNoSurroundingTag.get(0).head);
         assertEquals("TAIL1", foo.repeatingContentsNoSurroundingTag.get(0).tail);
@@ -108,7 +103,7 @@ public class BrowserTest {
             }
 
             @Override
-            public String post(final String post, final BasicNameValuePair... params) {
+            public String post(final String post, final Map<String, String>... params) {
                 return "DUMMY";
             }
         });
@@ -116,24 +111,25 @@ public class BrowserTest {
         assertEquals("http://www.foo.com/x/bar/y/baz", Browser.getCurentUrl());
     }
 
-    @Test(expected = GetException.class)
+    @Test
     public void testUriInvalidFormat() {
-        Browser.get("jnnkljbnkjb", Foo.class);
+        assertThrows(GetException.class, () -> Browser.get("jnnkljbnkjb", Foo.class));
     }
 
-    @Test(expected = GetException.class)
+    @Test
     public void testUriNotAccessible() {
-        Browser.get("www.thisurldoesnotexis.bla.blabla", Foo.class);
+        assertThrows(GetException.class, () -> Browser.get("www.thisurldoesnotexis.bla.blabla", Foo.class));
     }
 
-    @Test(expected = TooManyResultsException.class)
+    @Test
     public void tooManyResults() {
-        Browser.get(HTTP_URL, TooManyResultsError.class);
+        String url = mockWebServer.url("/foo").toString();
+        assertThrows(TooManyResultsException.class, () -> Browser.get(url, TooManyResultsError.class));
     }
 
-    @Test(expected = WrongTypeForField.class)
+    @Test
     public void testWrongType() {
-        Browser.get(HTTP_URL, WrongTypeError.class);
+        String url = mockWebServer.url("/foo").toString();
+        assertThrows(WrongTypeForField.class, () -> Browser.get(url, WrongTypeError.class));
     }
-
 }

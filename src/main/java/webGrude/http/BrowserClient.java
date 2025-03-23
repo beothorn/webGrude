@@ -1,8 +1,8 @@
 package webGrude.http;
 
-import org.apache.http.message.BasicNameValuePair;
+import java.util.Map;
 
 public interface BrowserClient {
-    public String get(final String get);
-    public String post(final String post, BasicNameValuePair... params);
+    String get(final String get);
+    String post(final String post, Map<String, String>... params);
 }
