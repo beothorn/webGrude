@@ -2,7 +2,9 @@ package webGrude.elements;
 
 import org.jsoup.nodes.Element;
 
-import webGrude.Browser;
+import webGrude.OkHttpBrowser;
+import webGrude.http.LinkVisitor;
+import webGrude.Webgrude;
 
 /**
  * A Link for a Page that can be visited.
@@ -24,7 +26,7 @@ import webGrude.Browser;
  * </p>
  *
  * @author beothorn
- * @see webGrude.Browser
+ * @see OkHttpBrowser
  * @see webGrude.annotations.Page
  * @see webGrude.annotations.Selector
  */
@@ -32,7 +34,8 @@ public class Link<T> {
 
     private final Class<T> type;
     private final Element hrefElement;
-    private final String currentPageUrl;
+    private final String baseUrl;
+    private final Webgrude pageToClassMapper;
 
     /***
      * A link uses maps a page from an url to an instance of a class annotated with <i>{@literal @}Page</i>.
@@ -42,21 +45,27 @@ public class Link<T> {
      * @param visitingType The type that will be mapped from the page when the method {@link #visit() visit} is called
      * @param baseUrl      The base url, it is used to resolve relative links
      */
-    public Link(final Element hrefElement, final Class<T> visitingType, final String baseUrl) {
+    public Link(
+        final Webgrude pageToClassMapper,
+        final Element hrefElement,
+        final Class<T> visitingType,
+        final String baseUrl
+    ) {
+        this.pageToClassMapper = pageToClassMapper;
         this.hrefElement = hrefElement;
         this.type = visitingType;
-        this.currentPageUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 2) : baseUrl;
+        this.baseUrl = baseUrl;
     }
 
     public String getLinkUrl() {
         final String href = this.hrefElement.attr("href");
         String urlToVisit = href;
         if (href.startsWith("/")) {
-            final String rootPage = this.currentPageUrl.replaceAll("(.*://.*?/).*", "$1");
+            final String rootPage = this.baseUrl.replaceAll("(.*://.*?/).*", "$1");
             urlToVisit = rootPage.substring(0, rootPage.length() - 1) + href;
         }
         if (href.startsWith(".")) {
-            urlToVisit = this.currentPageUrl + "/" + href;
+            urlToVisit = this.baseUrl + "/" + href;
         }
         return urlToVisit;
     }
@@ -66,8 +75,13 @@ public class Link<T> {
      *
      * @return an instance of visitingType
      */
-    public T visit() {
-        return Browser.get(this.getLinkUrl(), this.type);
+    public T visit(final LinkVisitor linkVisitor) {
+        final String linkUrl = this.getLinkUrl();
+        final boolean linkIsRelative = linkUrl.startsWith(".")
+                || linkUrl.startsWith("/")
+                || linkUrl.startsWith("?");
+        final String linkContents = linkVisitor.visitLink((linkIsRelative) ? baseUrl + linkUrl : linkUrl);
+        return pageToClassMapper.map(linkContents, type, baseUrl);
     }
 
 }

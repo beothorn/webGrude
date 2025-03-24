@@ -1,5 +1,7 @@
 package webGrude.annotations;
 
+import webGrude.OkHttpBrowser;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
@@ -60,8 +62,8 @@ import java.lang.annotation.Target;
  * @author beothorn
  * @see webGrude.annotations.Page
  * @see webGrude.elements.Link
- * @see webGrude.Browser#get(String, Class, String...)
- * @see webGrude.Browser#get(Class, String...)
+ * @see OkHttpBrowser#get(String, Class, String...)
+ * @see OkHttpBrowser#get(Class, String...)
  */
 @Repeatable(Selectors.class)
 @Retention(RetentionPolicy.RUNTIME)

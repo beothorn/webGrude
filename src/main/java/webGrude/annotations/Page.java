@@ -1,5 +1,7 @@
 package webGrude.annotations;
 
+import webGrude.OkHttpBrowser;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -32,8 +34,8 @@ import java.lang.annotation.Target;
  * </pre>
  *
  * @author beothorn
- * @see webGrude.Browser#get(Class, String...)
- * @see webGrude.Browser#get(String, Class, String...)
+ * @see OkHttpBrowser#get(Class, String...)
+ * @see OkHttpBrowser#get(String, Class, String...)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

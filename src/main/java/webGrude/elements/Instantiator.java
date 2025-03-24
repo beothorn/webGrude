@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import org.jsoup.nodes.Element;
 
 import webGrude.annotations.Selector;
+import webGrude.Webgrude;
 
 @SuppressWarnings("rawtypes")
 public class Instantiator {
@@ -128,8 +129,13 @@ public class Instantiator {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T visitableForNode(final Element node, final Class c, final String currentPageUrl) {
-        return (T) new Link<T>(node, c, currentPageUrl);
+    public static <T> T visitableForNode(
+            final Webgrude pageToClassMapper,
+            final Element node,
+            final Class c,
+            final String currentPageUrl
+    ) {
+        return (T) new Link<T>(pageToClassMapper, node, c, currentPageUrl);
     }
 
 }
