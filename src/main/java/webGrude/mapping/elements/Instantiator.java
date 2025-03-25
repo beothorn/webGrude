@@ -1,4 +1,4 @@
-package webGrude.elements;
+package webGrude.mapping.elements;
 
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 import org.jsoup.nodes.Element;
 
-import webGrude.annotations.Selector;
+import webGrude.mapping.annotations.Selector;
 import webGrude.Webgrude;
 
 @SuppressWarnings("rawtypes")

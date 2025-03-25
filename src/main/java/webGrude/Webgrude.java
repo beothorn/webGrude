@@ -4,13 +4,15 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import webGrude.annotations.AfterPageLoad;
-import webGrude.annotations.Page;
-import webGrude.annotations.Selector;
-import webGrude.annotations.Selectors;
-import webGrude.elements.Instantiator;
-import webGrude.elements.Link;
-import webGrude.elements.WrongTypeForField;
+import webGrude.mapping.IncompatibleTypes;
+import webGrude.mapping.TooManyResultsException;
+import webGrude.mapping.annotations.AfterPageLoad;
+import webGrude.mapping.annotations.Page;
+import webGrude.mapping.annotations.Selector;
+import webGrude.mapping.annotations.Selectors;
+import webGrude.mapping.elements.Instantiator;
+import webGrude.mapping.elements.Link;
+import webGrude.mapping.elements.WrongTypeForField;
 
 import java.lang.reflect.*;
 import java.net.URLEncoder;
@@ -21,11 +23,18 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static webGrude.elements.Instantiator.instanceForNode;
-import static webGrude.elements.Instantiator.typeIsKnown;
+import static webGrude.mapping.elements.Instantiator.instanceForNode;
+import static webGrude.mapping.elements.Instantiator.typeIsKnown;
 
 public class Webgrude {
 
+    /***
+     * Maps a Html string to a class with {@literal @}Selector annotations
+     * @param pageContents
+     * @param pageClass
+     * @return the page instance
+     * @param <T> The page class
+     */
     public <T> T map(
             final String pageContents,
             final Class<T> pageClass
@@ -34,6 +43,14 @@ public class Webgrude {
         return map(pageContents, pageClass, url);
     }
 
+    /***
+     * Maps a Html string to a class with {@literal @}Selector annotations
+     * @param pageContents
+     * @param pageClass
+     * @param baseUrl Used to populate links with the full href
+     * @return the page instance
+     * @param <T> The page class
+     */
     public <T> T map(
         final String pageContents,
         final Class<T> pageClass,
@@ -50,6 +67,12 @@ public class Webgrude {
         return pageObjectInstance;
     }
 
+    /***
+     * Gets the url from a class with a {@literal @}Page annotation
+     * @param pageClass A class with a {@literal @}Page annotation and an url value
+     * @param urlTemplateParams The values to replace the tokens.
+     * @return The url with the replaced tokens
+     */
     public String url(final Class<?> pageClass, final String... urlTemplateParams) {
         final String pageUrlTemplate = pageClass.getAnnotation(Page.class).value();
         final List<String> formattedParams = Arrays.stream(urlTemplateParams)

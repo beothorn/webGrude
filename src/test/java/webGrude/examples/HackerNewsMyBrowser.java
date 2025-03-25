@@ -5,8 +5,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.jetbrains.annotations.Nullable;
 import webGrude.Webgrude;
-import webGrude.annotations.Selector;
-import webGrude.elements.Link;
+import webGrude.mapping.annotations.Selector;
+import webGrude.mapping.elements.Link;
 
 import java.io.IOException;
 import java.util.List;

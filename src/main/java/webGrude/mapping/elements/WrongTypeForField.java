@@ -1,4 +1,4 @@
-package webGrude.elements;
+package webGrude.mapping.elements;
 
 import org.jsoup.nodes.Element;
 

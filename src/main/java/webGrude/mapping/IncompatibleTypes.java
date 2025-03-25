@@ -1,8 +1,8 @@
-package webGrude;
+package webGrude.mapping;
 
 import org.jsoup.nodes.Element;
 
-import webGrude.annotations.Selector;
+import webGrude.mapping.annotations.Selector;
 
 public class IncompatibleTypes extends Exception {
 

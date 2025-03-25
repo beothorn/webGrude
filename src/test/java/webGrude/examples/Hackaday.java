@@ -1,8 +1,8 @@
 package webGrude.examples;
 
 import webGrude.OkHttpBrowser;
-import webGrude.annotations.Page;
-import webGrude.annotations.Selector;
+import webGrude.mapping.annotations.Page;
+import webGrude.mapping.annotations.Selector;
 
 import java.util.Date;
 import java.util.List;

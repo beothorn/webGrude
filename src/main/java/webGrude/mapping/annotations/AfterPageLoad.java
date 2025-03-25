@@ -1,4 +1,4 @@
-package webGrude.annotations;
+package webGrude.mapping.annotations;
 
 import webGrude.OkHttpBrowser;
 

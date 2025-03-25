@@ -1,4 +1,4 @@
-package webGrude.annotations;
+package webGrude.mapping.annotations;
 
 import webGrude.OkHttpBrowser;
 
@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
  * <li>Float</li>
  * <li>Integer</li>
  * <li>Boolean</li>
- * <li>webGrude.elements.Link</li>
+ * <li>webGrude.mapping.elements.Link</li>
  * <li>org.jsoup.nodes.Element</li>
  * </ul>
  * Or a List of any of these types.<br>
@@ -60,8 +60,8 @@ import java.lang.annotation.Target;
  * </pre>
  *
  * @author beothorn
- * @see webGrude.annotations.Page
- * @see webGrude.elements.Link
+ * @see webGrude.mapping.annotations.Page
+ * @see webGrude.mapping.elements.Link
  * @see OkHttpBrowser#get(String, Class, String...)
  * @see OkHttpBrowser#get(Class, String...)
  */

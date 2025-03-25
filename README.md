@@ -1,7 +1,7 @@
 WebGrude
 =========
 
-  WebGrude is a java library for mapping a html to a java class through annotations with css selectors.  
+WebGrude is a java library for mapping a html to a java class through annotations with css selectors.  
 
 ```java
 @Page("https://news.ycombinator.com/")
@@ -20,26 +20,39 @@ public class HackerNews {
 }
 ```
 
-  It is suited for scraping pages that are generated server side and have a repeating structure with defined value types.  
+It is suited for scraping pages that are generated server side and have a repeating structure with defined value types.  
 
-  To use it add the @Page annotation on a class and annotate each field corresponding to a website value with a css selector, then call Browser.get to intantiate it.  
-  
-  You can write the url from where the values should be loaded from on the @Page annotation or call Browser.get passing the url as the first parameter. Also, it is possible to use tokens on your url and pass parameters to replace these tokens on Browser.get.  
-  
-  You can also use regex to format the scraped value to the field type.  
+To use it annotate fields with @Selector and they will be populated with the text value from the html matching the 
+selector.  
+You can write the url from where the values should be loaded from on a @Page annotation or call OkHttpBrowser.get 
+passing the url as the first parameter.  
+@Page can also have an url template and parameters.
+```java
+@Page("http://localhost:{0}/{1}/bar/{2}/baz")
+public class SomePage
+// Usage
+browser.get(SomePage.class, "john", "1")
+```
 
-  Webgrude tries to cast the values from the html to the field types. 
+You can also use regex to select a part of the scraped value to fill the field.  
+See the hackaday example below.  
+
+Webgrude tries to cast the values from the html to the field types. 
 The supported types are:
-- String : By default, the html text value is used on the field. It is possible to use an attribute value by passing an attr parameter to the @Selector annotation. 'html' and 'outerHtml' can also be used as attr value.
+- String : By default, the html text value is used on the field. It is possible to use an attribute value by passing an 
+attr parameter to the @Selector annotation. 'html' and 'outerHtml' can also be used as attr value.
 - int
 - float
 - boolean
 - Date : Assign the date format on the format field of the Selector annotation (See example below)  
 - List<> : Can be a list of any supported type or a list of a class annotated with @Selector 
-- webGrude.elements.Link<>  : A Link must be loaded from a tag containing a href attribute. Link has a method visit, which loads and returns an instance of the declared generic type.
+- Link<ClassWithSelectors>  : A Link must be loaded from a tag containing a href attribute. Link has a method visit, which loads and 
+returns an instance of the declared generic type.
+- List<Link<ClassWithSelectors>> : A list of links is also possible.
 - org.jsoup.nodes.Element : See http://jsoup.org/apidocs/org/jsoup/nodes/Element.html
 
-  If a value can't be casted an WrongTypeForField is thrown. This can be usefull when writing automated test that expects a certain value on a generated page.
+If a value can't be casted an WrongTypeForField is thrown. This can be useful when writing automated test that expects 
+a certain type value on a generated page.
 
 Maven dependency
 =========
@@ -62,8 +75,8 @@ import java.util.Date;
 import java.util.List;
 
 import webGrude.OkHttpBrowser;
-import webGrude.annotations.Page;
-import webGrude.annotations.Selector;
+import webGrude.mapping.annotations.Page;
+import webGrude.mapping.annotations.Selector;
 
 @Page("http://hackaday.com/blog/")
 public class Hackaday {

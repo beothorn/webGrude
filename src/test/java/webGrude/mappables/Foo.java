@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.jsoup.nodes.Element;
 
-import webGrude.annotations.AfterPageLoad;
-import webGrude.annotations.Page;
-import webGrude.annotations.Selector;
-import webGrude.elements.Link;
+import webGrude.mapping.annotations.AfterPageLoad;
+import webGrude.mapping.annotations.Page;
+import webGrude.mapping.annotations.Selector;
+import webGrude.mapping.elements.Link;
 
 @Page
 public class Foo {

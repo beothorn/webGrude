@@ -1,4 +1,4 @@
-package webGrude.elements;
+package webGrude.mapping.elements;
 
 import org.jsoup.nodes.Element;
 
@@ -27,8 +27,8 @@ import webGrude.Webgrude;
  *
  * @author beothorn
  * @see OkHttpBrowser
- * @see webGrude.annotations.Page
- * @see webGrude.annotations.Selector
+ * @see webGrude.mapping.annotations.Page
+ * @see webGrude.mapping.annotations.Selector
  */
 public class Link<T> {
 

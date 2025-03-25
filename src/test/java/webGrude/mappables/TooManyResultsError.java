@@ -1,7 +1,7 @@
 package webGrude.mappables;
 
-import webGrude.annotations.Page;
-import webGrude.annotations.Selector;
+import webGrude.mapping.annotations.Page;
+import webGrude.mapping.annotations.Selector;
 
 @Page
 public class TooManyResultsError {

@@ -1,7 +1,8 @@
 package webGrude;
 
 import org.junit.jupiter.api.Test;
-import webGrude.elements.WrongTypeForField;
+import webGrude.mapping.TooManyResultsException;
+import webGrude.mapping.elements.WrongTypeForField;
 import webGrude.mappables.Foo;
 import webGrude.mappables.TooManyResultsError;
 import webGrude.mappables.WrongTypeError;
