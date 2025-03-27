@@ -88,6 +88,7 @@ public class OkHttpBrowser implements LinkVisitor {
      * @return The class instantiated and with the fields with the {@literal @}Selector annotation populated.
      * @throws webGrude.mapping.elements.WrongTypeForField When a field have a type incompatible with the page html, example a <p>foo</p> on a float field
      * @throws TooManyResultsException    When a field maps to a type but the css selector returns more than one element
+     * @throws IOException    If something goes wrong fetching the page.
      */
     public <T> T execute(Request request, final Class<T> pageClass) throws IOException {
         try (Response response = client().newCall(request).execute()) {

@@ -35,7 +35,6 @@ import java.lang.annotation.Target;
  *
  * @author beothorn
  * @see OkHttpBrowser#get(Class, String...)
- * @see OkHttpBrowser#get(String, Class, String...)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

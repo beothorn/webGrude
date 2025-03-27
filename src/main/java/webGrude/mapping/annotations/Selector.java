@@ -62,7 +62,6 @@ import java.lang.annotation.Target;
  * @author beothorn
  * @see webGrude.mapping.annotations.Page
  * @see webGrude.mapping.elements.Link
- * @see OkHttpBrowser#get(String, Class, String...)
  * @see OkHttpBrowser#get(Class, String...)
  */
 @Repeatable(Selectors.class)

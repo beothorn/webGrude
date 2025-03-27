@@ -25,7 +25,7 @@ import webGrude.Webgrude;
  * <i> ExamplePage examplePage = linkToExample.visit(); </i>
  * </p>
  *
- * @author beothorn
+ * @param <T> The class populated by the link.
  * @see OkHttpBrowser
  * @see webGrude.mapping.annotations.Page
  * @see webGrude.mapping.annotations.Selector
@@ -39,7 +39,7 @@ public class Link<T> {
 
     /***
      * A link uses maps a page from an url to an instance of a class annotated with <i>{@literal @}Page</i>.
-     * when the method {@link #visit() visit} is called
+     * when the method {@link Link#visit(LinkVisitor)} is called
      *
      * @param hrefElement  A Jsoup Element with a href attribute
      * @param visitingType The type that will be mapped from the page when the method {@link #visit() visit} is called
