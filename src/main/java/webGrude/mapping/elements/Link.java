@@ -42,7 +42,7 @@ public class Link<T> {
      * when the method {@link Link#visit(LinkVisitor)} is called
      *
      * @param hrefElement  A Jsoup Element with a href attribute
-     * @param visitingType The type that will be mapped from the page when the method {@link #visit() visit} is called
+     * @param visitingType The type that will be mapped from the page when the method {@link Link#visit(LinkVisitor)} is called
      * @param baseUrl      The base url, it is used to resolve relative links
      */
     public Link(
