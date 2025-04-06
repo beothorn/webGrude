@@ -3,13 +3,11 @@ package webGrude;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 import webGrude.mapping.IncompatibleTypes;
 import webGrude.mapping.TooManyResultsException;
-import webGrude.mapping.annotations.AfterPageLoad;
-import webGrude.mapping.annotations.Page;
-import webGrude.mapping.annotations.Selector;
-import webGrude.mapping.annotations.Selectors;
+import webGrude.mapping.annotations.*;
 import webGrude.mapping.elements.Instantiator;
 import webGrude.mapping.elements.Link;
 import webGrude.mapping.elements.WrongTypeForField;
@@ -18,10 +16,7 @@ import java.lang.reflect.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static webGrude.mapping.elements.Instantiator.instanceForNode;
 import static webGrude.mapping.elements.Instantiator.typeIsKnown;
@@ -56,9 +51,19 @@ public class Webgrude {
         final Class<T> pageClass,
         final String baseUrl
     ) {
-        final Document parse = Jsoup.parse(pageContents);
 
-        final T pageObjectInstance = loadDomContents(baseUrl, parse, pageClass);
+        Page pageAnnotation = pageClass.getAnnotation(Page.class);
+
+        ParseFormat format = ParseFormat.HTML;
+
+        if (pageAnnotation != null) {
+            format = pageAnnotation.format();
+        }
+
+        final Document parse = format.equals(ParseFormat.HTML) ?
+                Jsoup.parse(pageContents) : Jsoup.parse("<root>" + pageContents + "</root>", Parser.xmlParser());
+
+        final T pageObjectInstance = loadContents(baseUrl, parse, pageClass, format);
 
         Arrays.stream(pageClass.getDeclaredMethods())
                 .filter(m -> m.getAnnotation(AfterPageLoad.class) != null)
@@ -74,7 +79,9 @@ public class Webgrude {
      * @return The url with the replaced tokens
      */
     public String url(final Class<?> pageClass, final String... urlTemplateParams) {
-        final String pageUrlTemplate = pageClass.getAnnotation(Page.class).value();
+        Page pageAnnotation = pageClass.getAnnotation(Page.class);
+        final String pageUrlTemplate = pageAnnotation != null ? pageAnnotation.value() : "";
+
         final List<String> formattedParams = Arrays.stream(urlTemplateParams)
                 .map(Webgrude::encodeOrThrow)
                 .toList();
@@ -82,13 +89,14 @@ public class Webgrude {
         return MessageFormat.format(pageUrlTemplate, formattedParams.toArray());
     }
 
-    private <T> T loadDomContents(
+    private <T> T loadContents(
             final String baseUrl,
             final Element node,
-            final Class<T> clazz
+            final Class<T> clazz,
+            final ParseFormat parseFormat
     ){
         try {
-            return internalLoadDomContents(baseUrl, node, clazz);
+            return internalLoadContents(baseUrl, node, clazz, parseFormat);
         } catch (TooManyResultsException | WrongTypeForField e) {
             throw e;
         } catch (final Exception e) {
@@ -96,10 +104,11 @@ public class Webgrude {
         }
     }
 
-    private <T> T internalLoadDomContents(
+    private <T> T internalLoadContents(
         final String baseUrl,
         final Element node,
-        final Class<T> clazz
+        final Class<T> clazz,
+        final ParseFormat parseFormat
     ) throws InstantiationException, IllegalAccessException, InvocationTargetException, IncompatibleTypes {
         final Constructor<T> constructor;
         try{
@@ -115,7 +124,7 @@ public class Webgrude {
             final Class<?> fieldClass = f.getType();
 
             if (fieldClass.equals(java.util.List.class) && f.getAnnotation(Selector.class) == null) {
-                solveListOfAnnotatedType(baseUrl, node, newInstance, f);
+                solveListOfAnnotatedType(baseUrl, node, newInstance, f, parseFormat);
             }
 
             if (f.getAnnotation(Selectors.class) != null) {
@@ -123,11 +132,11 @@ public class Webgrude {
             }
 
             if (f.getAnnotation(Selector.class) != null) {
-                solveAnnotatedField(baseUrl, node, newInstance, f, fieldClass);
+                solveAnnotatedField(baseUrl, node, newInstance, f, fieldClass, parseFormat);
             }
 
             if (fieldClass.getAnnotation(Selector.class) != null) {
-                solveUnannotatedFieldOfAnnotatedType(baseUrl, node, newInstance, f, fieldClass);
+                solveUnannotatedFieldOfAnnotatedType(baseUrl, node, newInstance, f, fieldClass, parseFormat);
             }
 
         }
@@ -139,26 +148,39 @@ public class Webgrude {
         final Element node,
         final T newInstance,
         final Field f,
-        final Class<?> fieldClass
-    ) throws IllegalAccessException, InstantiationException {
-        final String cssQuery = fieldClass.getAnnotation(Selector.class).value();
-        final Element selectedNode = getFirstOrNullOrCryIfMoreThanOne(node, cssQuery);
+        final Class<?> fieldClass,
+        final ParseFormat parseFormats
+    ) throws IllegalAccessException {
+        Selector selector = fieldClass.getAnnotation(Selector.class);
+        final String query = selector.value();
+        final Element selectedNode = getFirstOrNullOrCryIfMoreThanOne(node, selector.useXpath(), query);
         if (selectedNode == null) {
             return;
         }
-        final Document innerHtml = Jsoup.parse(selectedNode.html());
-        f.setAccessible(true);
-        f.set(newInstance, loadDomContents(baseUrl, innerHtml, fieldClass));
+
+        if (parseFormats.equals(ParseFormat.HTML)) {
+            final Document doc = Jsoup.parse(selectedNode.html());
+            f.setAccessible(true);
+            f.set(newInstance, loadContents(baseUrl, doc, fieldClass, ParseFormat.HTML));
+        }
+
+        if (parseFormats.equals(ParseFormat.XML)) {
+            final Document doc = Jsoup.parse("<root>" + selectedNode.html() + "</root>", Parser.xmlParser());
+            f.setAccessible(true);
+            f.set(newInstance, loadContents(baseUrl, doc, fieldClass, ParseFormat.XML));
+        }
+
     }
 
     private static Element getFirstOrNullOrCryIfMoreThanOne(
             final Element node,
-            final String cssQuery
+            final boolean isXpath,
+            final String query
     ){
-        final Elements elements = node.select(cssQuery);
+        final Elements elements = (isXpath) ? node.selectXpath("/root" + query) : node.select(query);
         final int size = elements.size();
         if (size > 1) {
-            throw new TooManyResultsException(cssQuery, size);
+            throw new TooManyResultsException(query, size);
         }
         if (size == 0) {
             return null;
@@ -175,9 +197,9 @@ public class Webgrude {
     ) throws IncompatibleTypes {
         final Selectors selectorsAnnotation = f.getAnnotation(Selectors.class);
         for (final Selector selectorAnnotation : selectorsAnnotation.value()) {
-            final String cssQuery = selectorAnnotation.value();
+            final String query = selectorAnnotation.value();
 
-            final Element selectedNode = getFirstOrNullOrCryIfMoreThanOne(node, cssQuery);
+            final Element selectedNode = getFirstOrNullOrCryIfMoreThanOne(node, selectorAnnotation.useXpath() , query);
             if (selectedNode == null) continue;
 
             if (Instantiator.typeIsVisitable(fieldClass)) {
@@ -240,10 +262,11 @@ public class Webgrude {
             final Element node,
             final T newInstance,
             final Field f,
-            final Class<?> fieldClass
-    ) throws IllegalAccessException, InstantiationException {
+            final Class<?> fieldClass,
+            final ParseFormat parseFormat
+    ) throws IllegalAccessException {
         if (fieldClass.equals(java.util.List.class)) {
-            solveAnnotatedListField(baseUrl, node, newInstance, f);
+            solveAnnotatedListField(baseUrl, node, newInstance, f, parseFormat);
         } else {
             solveAnnotatedFieldWithMappableType(baseUrl, node, newInstance, f, fieldClass);
         }
@@ -257,8 +280,8 @@ public class Webgrude {
             final Class<?> fieldClass
     ) throws IllegalAccessException {
         final Selector selectorAnnotation = f.getAnnotation(Selector.class);
-        final String cssQuery = selectorAnnotation.value();
-        final Element selectedNode = getFirstOrNullOrCryIfMoreThanOne(node, cssQuery);
+        final String query = selectorAnnotation.value();
+        final Element selectedNode = getFirstOrNullOrCryIfMoreThanOne(node, selectorAnnotation.useXpath(), query);
         if (selectedNode == null) return;
 
         if (Instantiator.typeIsVisitable(fieldClass)) {
@@ -269,6 +292,9 @@ public class Webgrude {
 
                 if (actualType instanceof Class<?> clazz) {
                     f.setAccessible(true);
+                    if (!f.canAccess(newInstance)) {
+                        throw new RuntimeException("Can't access field " + f.getName());
+                    }
                     try{
                         f.set(newInstance, Instantiator.visitableForNode(this, selectedNode, clazz, baseUrl));
                         return;
@@ -282,6 +308,9 @@ public class Webgrude {
 
         if (typeIsKnown(fieldClass)) {
             f.setAccessible(true);
+            if (!f.canAccess(newInstance)) {
+                throw new RuntimeException("Can't access field " + f.getName());
+            }
             f.set(newInstance, instanceForNode(selectedNode, selectorAnnotation, fieldClass));
             return;
         }
@@ -303,12 +332,13 @@ public class Webgrude {
             final String baseUrl,
             final Element node,
             final T newInstance,
-            final Field f
+            final Field f,
+            final ParseFormat parseFormat
     ) throws IllegalAccessException {
         final Type genericType = f.getGenericType();
         final Selector selector = f.getAnnotation(Selector.class);
-        final String cssQuery = selector.value();
-        final Elements nodes = node.select(cssQuery);
+        final String query = selector.value();
+        final Elements nodes = selector.useXpath() ? node.selectXpath("/root" + query) : node.select(query);
         final Type type = ((ParameterizedType) genericType).getActualTypeArguments()[0];
         if (type instanceof ParameterizedType) {
             f.setAccessible(true);
@@ -318,38 +348,40 @@ public class Webgrude {
 
         final Class<?> listClass = (Class<?>) type;
         f.setAccessible(true);
-        f.set(newInstance, populateList(baseUrl, nodes, selector, listClass));
+        f.set(newInstance, populateList(baseUrl, nodes, selector, listClass, parseFormat));
     }
 
     private <T> void solveListOfAnnotatedType(
         final String baseUrl,
         final Element node,
         final T newInstance,
-        final Field f
+        final Field f,
+        final ParseFormat parseFormat
     ) throws IllegalAccessException {
         final Type genericType = f.getGenericType();
         final Class<?> listClass = (Class<?>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
-        final Selector selectorAnnotation = listClass.getAnnotation(Selector.class);
-        if (selectorAnnotation == null) return;
+        final Selector selector = listClass.getAnnotation(Selector.class);
+        if (selector == null) return;
 
-        final String cssQuery = selectorAnnotation.value();
-        final Elements nodes = node.select(cssQuery);
+        final String query = selector.value();
+        final Elements nodes = selector.useXpath() ? node.selectXpath("/root" + query) : node.select(query);
         f.setAccessible(true);
-        f.set(newInstance, populateList(baseUrl, nodes, selectorAnnotation, listClass));
+        f.set(newInstance, populateList(baseUrl, nodes, selector, listClass, parseFormat));
     }
 
     private <T> List<T> populateList(
         final String baseUrl,
         final Elements nodes,
         final Selector selector,
-        final Class<T> clazz
+        final Class<T> clazz,
+        final  ParseFormat parseFormat
     ) {
         final ArrayList<T> newInstanceList = new ArrayList<>();
         for (final Element node : nodes) {
             if (typeIsKnown(clazz)) {
                 newInstanceList.add(instanceForNode(node, selector, clazz));
             } else {
-                newInstanceList.add(loadDomContents(baseUrl, node, clazz));
+                newInstanceList.add(loadContents(baseUrl, node, clazz, parseFormat));
             }
         }
         return newInstanceList;

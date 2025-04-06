@@ -17,10 +17,17 @@ import java.lang.annotation.Target;
  * It's also possible to parameterize the url using the tokens {0}, {2}, ...
  * </p>
  * <p>
- * A class to map the example home page would be annotated as such <br>
+ * A class to map, the example home page would be annotated as such <br>
  * </p>
  * <pre>
  * {@code @Page("http://www.example.com");}
+ * </pre>
+ * <p>
+ * <p>
+ * While an xml would look like this: <br>
+ * </p>
+ * <pre>
+ * {@code @Page(value = "http://www.example.com", format="xml");}
  * </pre>
  * <p>
  * A class to load a url parameterized could be like this <br>
@@ -40,4 +47,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface Page {
     String value() default "";
+    ParseFormat format() default ParseFormat.HTML;
 }

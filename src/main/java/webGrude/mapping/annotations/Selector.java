@@ -74,4 +74,5 @@ public @interface Selector {
     String format() default NOVALUE;
     String locale() default NOVALUE;
     String defValue() default NOVALUE;
+    boolean useXpath() default false;
 }

@@ -15,13 +15,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class BrowserTest {
 
     private MockWebServer mockWebServer;
-    private OkHttpBrowser okHttpBrowser = new OkHttpBrowser();
+    private final OkHttpBrowser okHttpBrowser = new OkHttpBrowser();
 
     @BeforeEach
     public void setup() throws IOException {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
-        final String body = MappingTest.readTestResource("Foo.html");
+        final String body = TestUtils.readTestResource("Foo.html");
 
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(200)

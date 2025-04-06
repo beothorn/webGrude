@@ -10,7 +10,6 @@ import webGrude.mapping.annotations.Page;
 import webGrude.mapping.annotations.Selector;
 import webGrude.mapping.elements.Link;
 
-@Page
 public class Foo {
 
     @Selector("")

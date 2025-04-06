@@ -7,12 +7,6 @@ import webGrude.mappables.Foo;
 import webGrude.mappables.TooManyResultsError;
 import webGrude.mappables.WrongTypeError;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
@@ -21,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class MappingTest {
 
-    final String fooPageContents = readTestResource("Foo.html");
+    final String fooPageContents = TestUtils.readTestResource("Foo.html");
     final Webgrude pageToClassMapper = new Webgrude();
 
     @Test
@@ -106,19 +100,6 @@ public class MappingTest {
     @Test
     public void testWrongType() {
         assertThrows(WrongTypeForField.class, () ->  pageToClassMapper.map(fooPageContents, WrongTypeError.class));
-    }
-
-    public static String readTestResource(String resourceName) {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        URL resource = classLoader.getResource(resourceName);
-        if (resource == null) {
-            throw new IllegalArgumentException("Resource not found: " + resourceName);
-        }
-        try {
-            return Files.readString(Paths.get(resource.toURI()), StandardCharsets.UTF_8);
-        } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

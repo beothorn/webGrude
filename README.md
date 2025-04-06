@@ -1,7 +1,7 @@
 WebGrude
 =========
 
-WebGrude is a java library for mapping a html to a java class through annotations with css selectors.  
+WebGrude is a java library for mapping a html or xml to a java class through annotations with css selectors.  
 
 ```java
 @Page("https://news.ycombinator.com/")
@@ -61,7 +61,7 @@ Maven dependency
 <dependency>
   <groupId>com.github.beothorn</groupId>
   <artifactId>webGrude</artifactId>
-  <version>3.0.0</version>
+  <version>4.0.0</version>
 </dependency>
 ```
 
@@ -101,6 +101,58 @@ public class Hackaday {
         final Hackaday hackaday = new OkHttpBrowser().get(Hackaday.class);
         hackaday.posts.forEach(System.out::println);
     }
+}
+```
+
+## Xml read
+
+```xml
+<aaa>
+    <ab>
+        Test
+    </ab>
+    <ac>
+        Another test
+    </ac>
+    <a1>
+        A1test
+    </a1>
+    <aNested>
+        <content>
+            Nested content
+        </content>
+        <item>a</item>
+        <item>b</item>
+        <item>c</item>
+    </aNested>
+
+</aaa>
+```
+
+```java
+@Page(format = ParseFormat.XML)
+public class Bar {
+
+    @Selector(value = "/aaa/ab", useXpath = true)
+    private String ab;
+
+    @Selector(value = "/aaa/ac", useXpath = true)
+    private String ac;
+
+    @Selector(value = "/aaa/a1", useXpath = true)
+    private String a1;
+
+    @Selector(value = "/aaa/aNested", useXpath = true)
+    public static class NestedContent {
+        // root ensures sub xml is valid
+        @Selector(value = "/content", useXpath = true)
+        private String content;
+
+        @Selector(value = "/item", useXpath = true)
+        private List<String> items;
+    }
+
+    NestedContent content;
 }
 ```
 
