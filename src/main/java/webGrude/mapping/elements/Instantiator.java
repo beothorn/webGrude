@@ -1,5 +1,8 @@
 package webGrude.mapping.elements;
 
+import org.jsoup.nodes.Element;
+import webGrude.Webgrude;
+
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -8,11 +11,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.jsoup.nodes.Element;
-
-import webGrude.mapping.annotations.Selector;
-import webGrude.Webgrude;
 
 @SuppressWarnings("rawtypes")
 public class Instantiator {
@@ -31,13 +29,13 @@ public class Instantiator {
     @SuppressWarnings("unchecked")
     public static <T> T instanceForNode(
         final Element node,
-        final Selector s,
+        final FieldMapping fieldMapping,
         final Class<T> c
     ) {
-        final String attribute = s.attr();
-        final String format = s.format();
-        final String locale = s.locale();
-        final String defValue = s.defValue();
+        final String attribute = fieldMapping.attr();
+        final String format = fieldMapping.format();
+        final String locale = fieldMapping.locale();
+        final String defValue = fieldMapping.defValue();
 
         String value;
 
@@ -58,7 +56,7 @@ public class Instantiator {
                 value = node.text();
             }
 
-            if(!c.equals(Date.class) && format != null && !format.equals(Selector.NOVALUE) ){
+            if(!c.equals(Date.class) && format != null && !format.isEmpty()){
                 final Pattern p = Pattern.compile(format);
                 final Matcher matcher = p.matcher(value);
                 final boolean found = matcher.find();
@@ -96,9 +94,7 @@ public class Instantiator {
             if (c.equals(Boolean.class) || c.getSimpleName().equals("boolean")) {
                 return (T) Boolean.valueOf(value);
             }
-
         } catch (final Exception e) {
-
             throw new WrongTypeForField(node, attribute, c, e);
         }
 
@@ -107,7 +103,7 @@ public class Instantiator {
 
     private static Locale getLocale(String locale) {
         Locale loc = Locale.getDefault();
-        if(!locale.equals(Selector.NOVALUE)){
+        if(locale != null && !locale.isEmpty()){
 
             if (locale.contains("_")) {
                 String[] parts = locale.split("_");

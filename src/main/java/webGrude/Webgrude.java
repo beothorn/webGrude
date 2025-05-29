@@ -8,6 +8,7 @@ import org.jsoup.select.Elements;
 import webGrude.mapping.IncompatibleTypes;
 import webGrude.mapping.TooManyResultsException;
 import webGrude.mapping.annotations.*;
+import webGrude.mapping.elements.FieldMapping;
 import webGrude.mapping.elements.Instantiator;
 import webGrude.mapping.elements.Link;
 import webGrude.mapping.elements.WrongTypeForField;
@@ -15,6 +16,7 @@ import webGrude.mapping.elements.WrongTypeForField;
 import java.lang.reflect.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidParameterException;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -51,13 +53,12 @@ public class Webgrude {
         final Class<T> pageClass,
         final String baseUrl
     ) {
-
-        Page pageAnnotation = pageClass.getAnnotation(Page.class);
+        XML xmlAnnotation = pageClass.getAnnotation(XML.class);
 
         ParseFormat format = ParseFormat.HTML;
 
-        if (pageAnnotation != null) {
-            format = pageAnnotation.format();
+        if (xmlAnnotation != null) {
+            format = ParseFormat.XML;
         }
 
         final Document parse = format.equals(ParseFormat.HTML) ?
@@ -82,11 +83,8 @@ public class Webgrude {
         Page pageAnnotation = pageClass.getAnnotation(Page.class);
         final String pageUrlTemplate = pageAnnotation != null ? pageAnnotation.value() : "";
 
-        final List<String> formattedParams = Arrays.stream(urlTemplateParams)
-                .map(Webgrude::encodeOrThrow)
-                .toList();
-
-        return MessageFormat.format(pageUrlTemplate, formattedParams.toArray());
+        return MessageFormat.format(pageUrlTemplate, Arrays.stream(urlTemplateParams)
+                .map(Webgrude::encodeOrThrow).toArray());
     }
 
     private <T> T loadContents(
@@ -131,16 +129,48 @@ public class Webgrude {
                 solveRepeatableAnnotatedFieldWithMappableType(baseUrl, node, newInstance, f, fieldClass);
             }
 
-            if (f.getAnnotation(Selector.class) != null) {
+            if (hasMappingAnnotation(f)) {
                 solveAnnotatedField(baseUrl, node, newInstance, f, fieldClass, parseFormat);
             }
 
-            if (fieldClass.getAnnotation(Selector.class) != null) {
+            if (hasMappingAnnotation(fieldClass)) {
                 solveUnannotatedFieldOfAnnotatedType(baseUrl, node, newInstance, f, fieldClass, parseFormat);
             }
 
         }
         return newInstance;
+    }
+
+    private static boolean hasMappingAnnotation(Field f) {
+        return f.getAnnotation(Selector.class) != null || f.getAnnotation(XPath.class) != null;
+    }
+
+    private static boolean hasMappingAnnotation(Class<?> fieldClass) {
+        return fieldClass.getAnnotation(Selector.class) != null || fieldClass.getAnnotation(XPath.class) != null;
+    }
+
+    private static boolean isXPath(final Class<?> fieldClass) {
+        return fieldClass.getAnnotation(XPath.class) != null;
+    }
+
+    private static boolean isXPath(final Field f) {
+        return f.getAnnotation(XPath.class) != null;
+    }
+
+    private static String getQuery(Class<?> fieldClass) {
+        final Selector selector = fieldClass.getAnnotation(Selector.class);
+        if (selector != null) return selector.value();
+        final XPath xpath = fieldClass.getAnnotation(XPath.class);
+        if (xpath != null) return xpath.value();
+        throw new InvalidParameterException("Class has no annotation Selector or XPath");
+    }
+
+    private static String getQuery(Field f) {
+        final Selector selector = f.getAnnotation(Selector.class);
+        if (selector != null) return selector.value();
+        final XPath xpath = f.getAnnotation(XPath.class);
+        if (xpath != null) return xpath.value();
+        throw new InvalidParameterException("Class has no annotation Selector or XPath");
     }
 
     private <T> void solveUnannotatedFieldOfAnnotatedType(
@@ -151,9 +181,10 @@ public class Webgrude {
         final Class<?> fieldClass,
         final ParseFormat parseFormats
     ) throws IllegalAccessException {
-        Selector selector = fieldClass.getAnnotation(Selector.class);
-        final String query = selector.value();
-        final Element selectedNode = getFirstOrNullOrCryIfMoreThanOne(node, selector.useXpath(), query);
+        boolean isXPath = isXPath(fieldClass);
+        final String query = getQuery(fieldClass);
+
+        final Element selectedNode = getFirstOrNullOrCryIfMoreThanOne(node, isXPath, query);
         if (selectedNode == null) {
             return;
         }
@@ -199,18 +230,21 @@ public class Webgrude {
         for (final Selector selectorAnnotation : selectorsAnnotation.value()) {
             final String query = selectorAnnotation.value();
 
-            final Element selectedNode = getFirstOrNullOrCryIfMoreThanOne(node, selectorAnnotation.useXpath() , query);
+            final Element selectedNode = getFirstOrNullOrCryIfMoreThanOne(node, false , query);
             if (selectedNode == null) continue;
 
             if (Instantiator.typeIsVisitable(fieldClass)) {
                 Type genericType = f.getGenericType();
 
-                if (genericType instanceof ParameterizedType outerType) {
-                    Type innerType = outerType.getActualTypeArguments()[0];
-                    if (innerType instanceof ParameterizedType innerParamType) {
-                        Type deepestType = innerParamType.getActualTypeArguments()[0];
+                if (genericType instanceof ParameterizedType) {
+                    final ParameterizedType outerType = (ParameterizedType) genericType;
+                    final Type innerType = outerType.getActualTypeArguments()[0];
+                    if (innerType instanceof ParameterizedType) {
+                        final ParameterizedType innerParamType = (ParameterizedType) innerType;
+                        final Type deepestType = innerParamType.getActualTypeArguments()[0];
 
-                        if (deepestType instanceof Class<?> clazz) {
+                        if (deepestType instanceof Class<?>) {
+                            final Class<?> clazz = (Class<?>) deepestType;
                             f.setAccessible(true);
                             try{
                                 f.set(newInstance, Instantiator.visitableForNode(this, selectedNode, clazz, baseUrl));
@@ -227,9 +261,11 @@ public class Webgrude {
             if (typeIsKnown(fieldClass)) {
                 f.setAccessible(true);
                 try{
+                    final Optional<FieldMapping> maybeFieldMapping = FieldMapping.from(f);
+                    final FieldMapping fieldMapping = maybeFieldMapping.orElseThrow();
                     f.set(newInstance, instanceForNode(
                             selectedNode,
-                            selectorAnnotation,
+                            fieldMapping,
                             fieldClass
                     ));
                 } catch (final IllegalArgumentException | IllegalAccessException e){
@@ -279,18 +315,24 @@ public class Webgrude {
             final Field f,
             final Class<?> fieldClass
     ) throws IllegalAccessException {
-        final Selector selectorAnnotation = f.getAnnotation(Selector.class);
-        final String query = selectorAnnotation.value();
-        final Element selectedNode = getFirstOrNullOrCryIfMoreThanOne(node, selectorAnnotation.useXpath(), query);
+        Optional<FieldMapping> maybeFieldMapping = FieldMapping.from(f);
+
+        if (maybeFieldMapping.isEmpty()) return;
+
+        final FieldMapping fieldMapping = maybeFieldMapping.get();
+
+        final Element selectedNode = getFirstOrNullOrCryIfMoreThanOne(node, fieldMapping.useXpath(), fieldMapping.value());
         if (selectedNode == null) return;
 
         if (Instantiator.typeIsVisitable(fieldClass)) {
-            Type genericType = f.getGenericType();
+            final Type genericType = f.getGenericType();
 
-            if (genericType instanceof ParameterizedType parameterizedType) {
-                Type actualType = parameterizedType.getActualTypeArguments()[0];
+            if (genericType instanceof ParameterizedType) {
+                final ParameterizedType parameterizedType = (ParameterizedType) genericType;
+                final Type actualType = parameterizedType.getActualTypeArguments()[0];
 
-                if (actualType instanceof Class<?> clazz) {
+                if (actualType instanceof Class<?>) {
+                    final Class<?> clazz = (Class<?>) actualType;
                     f.setAccessible(true);
                     if (!f.canAccess(newInstance)) {
                         throw new RuntimeException("Can't access field " + f.getName());
@@ -311,7 +353,7 @@ public class Webgrude {
             if (!f.canAccess(newInstance)) {
                 throw new RuntimeException("Can't access field " + f.getName());
             }
-            f.set(newInstance, instanceForNode(selectedNode, selectorAnnotation, fieldClass));
+            f.set(newInstance, instanceForNode(selectedNode, fieldMapping, fieldClass));
             return;
         }
 
@@ -336,19 +378,29 @@ public class Webgrude {
             final ParseFormat parseFormat
     ) throws IllegalAccessException {
         final Type genericType = f.getGenericType();
-        final Selector selector = f.getAnnotation(Selector.class);
-        final String query = selector.value();
-        final Elements nodes = selector.useXpath() ? node.selectXpath("/root" + query) : node.select(query);
-        final Type type = ((ParameterizedType) genericType).getActualTypeArguments()[0];
-        if (type instanceof ParameterizedType) {
-            f.setAccessible(true);
-            f.set(newInstance, populateListOfLinks(baseUrl, nodes, (ParameterizedType) type));
-            return;
-        }
+        Optional<FieldMapping> maybeFieldMapping = FieldMapping.from(f);
+        maybeFieldMapping.ifPresent( fieldMapping -> {
+            final String value = fieldMapping.value();
+            final Elements nodes = fieldMapping.useXpath() ? node.selectXpath("/root" + value) : node.select(value);
+            final Type type = ((ParameterizedType) genericType).getActualTypeArguments()[0];
+            if (type instanceof ParameterizedType) {
+                f.setAccessible(true);
+                try {
+                    f.set(newInstance, populateListOfLinks(baseUrl, nodes, (ParameterizedType) type));
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+                return;
+            }
 
-        final Class<?> listClass = (Class<?>) type;
-        f.setAccessible(true);
-        f.set(newInstance, populateList(baseUrl, nodes, selector, listClass, parseFormat));
+            final Class<?> listClass = (Class<?>) type;
+            f.setAccessible(true);
+            try {
+                f.set(newInstance, populateList(baseUrl, nodes, fieldMapping, listClass, parseFormat));
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private <T> void solveListOfAnnotatedType(
@@ -357,29 +409,34 @@ public class Webgrude {
         final T newInstance,
         final Field f,
         final ParseFormat parseFormat
-    ) throws IllegalAccessException {
+    ) {
         final Type genericType = f.getGenericType();
         final Class<?> listClass = (Class<?>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
-        final Selector selector = listClass.getAnnotation(Selector.class);
-        if (selector == null) return;
+        Optional<FieldMapping> maybeFieldMapping = FieldMapping.from(listClass);
 
-        final String query = selector.value();
-        final Elements nodes = selector.useXpath() ? node.selectXpath("/root" + query) : node.select(query);
-        f.setAccessible(true);
-        f.set(newInstance, populateList(baseUrl, nodes, selector, listClass, parseFormat));
+        maybeFieldMapping.ifPresent( fieldMapping -> {
+            final String query = fieldMapping.value();
+            final Elements nodes = fieldMapping.useXpath() ? node.selectXpath("/root" + query) : node.select(query);
+            f.setAccessible(true);
+            try {
+                f.set(newInstance, populateList(baseUrl, nodes, fieldMapping, listClass, parseFormat));
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private <T> List<T> populateList(
         final String baseUrl,
         final Elements nodes,
-        final Selector selector,
+        final FieldMapping fieldMapping,
         final Class<T> clazz,
         final  ParseFormat parseFormat
     ) {
         final ArrayList<T> newInstanceList = new ArrayList<>();
         for (final Element node : nodes) {
             if (typeIsKnown(clazz)) {
-                newInstanceList.add(instanceForNode(node, selector, clazz));
+                newInstanceList.add(instanceForNode(node, fieldMapping, clazz));
             } else {
                 newInstanceList.add(loadContents(baseUrl, node, clazz, parseFormat));
             }

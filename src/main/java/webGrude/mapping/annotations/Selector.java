@@ -9,13 +9,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotates a field to be mapped to a html element.
+ * Annotates a field to be mapped using a css selector.
  * <p>
- * A field annotated with this will receive the value correspondin to it's css
- * selector when the webgrude Browser loads a page. This field <b>must</b> be in
- * a class annotated with <i>{@literal @}Page</i>.
- * The field type can be any class with the <i>{@literal @}Page</i> or one of
- * the following types (or its primitive):
+ * A field annotated with this will receive the value corresponding to it's css
+ * selector when mapped.
+ * The field can be any of the following types (or its primitive):
  * <ul>
  * <li>String</li>
  * <li>Float</li>
@@ -68,11 +66,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD})
 public @interface Selector {
-    String NOVALUE = "[unassigned]";
     String value();
     String attr() default "";
-    String format() default NOVALUE;
-    String locale() default NOVALUE;
-    String defValue() default NOVALUE;
-    boolean useXpath() default false;
+    String format() default "";
+    String locale() default "";
+    String defValue() default "";
 }

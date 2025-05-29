@@ -9,6 +9,7 @@ import java.util.List;
 
 @Page("http://hackaday.com/blog/")
 public class Hackaday {
+
     @Selector("article")
     static class Post {
         @Selector(".entry-title")
@@ -17,6 +18,8 @@ public class Hackaday {
         int commentsCount;//using regex to extract number
         @Selector(value = ".entry-date a", format = "MMMM dd, yyyy - hh:mm a", attr = "title", locale = "en_US")
         Date date;//using date format
+
+        String unusedField;
 
         @Override
         public String toString() {

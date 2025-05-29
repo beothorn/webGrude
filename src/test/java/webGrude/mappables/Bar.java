@@ -1,30 +1,28 @@
 package webGrude.mappables;
 
-import webGrude.mapping.annotations.Page;
-import webGrude.mapping.annotations.ParseFormat;
-import webGrude.mapping.annotations.Selector;
+import webGrude.mapping.annotations.*;
 
 import java.util.List;
 
-@Page(format = ParseFormat.XML)
+@XML
 public class Bar {
 
-    @Selector(value = "/aaa/ab", useXpath = true)
+    @XPath("/aaa/ab")
     private String ab;
 
-    @Selector(value = "/aaa/ac", useXpath = true)
+    @XPath("/aaa/ac")
     private String ac;
 
-    @Selector(value = "/aaa/a1", useXpath = true)
+    @XPath("/aaa/a1")
     private String a1;
 
-    @Selector(value = "/aaa/aNested", useXpath = true)
+    @XPath("/aaa/aNested")
     public static class NestedContent {
         // root ensures sub xml is valid
-        @Selector(value = "/content", useXpath = true)
+        @XPath("/content")
         private String content;
 
-        @Selector(value = "/item", useXpath = true)
+        @XPath("/item")
         private List<String> items;
 
         @Override
