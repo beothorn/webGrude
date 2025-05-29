@@ -125,10 +125,6 @@ public class Webgrude {
                 solveListOfAnnotatedType(baseUrl, node, newInstance, f, parseFormat);
             }
 
-            if (f.getAnnotation(Selectors.class) != null) {
-                solveRepeatableAnnotatedFieldWithMappableType(baseUrl, node, newInstance, f, fieldClass);
-            }
-
             if (hasMappingAnnotation(f)) {
                 solveAnnotatedField(baseUrl, node, newInstance, f, fieldClass, parseFormat);
             }
@@ -217,66 +213,6 @@ public class Webgrude {
             return null;
         }
         return elements.first();
-    }
-
-    private <T> void solveRepeatableAnnotatedFieldWithMappableType(
-            final String baseUrl,
-            final Element node,
-            final T newInstance,
-            final Field f,
-            final Class<?> fieldClass
-    ) throws IncompatibleTypes {
-        final Selectors selectorsAnnotation = f.getAnnotation(Selectors.class);
-        for (final Selector selectorAnnotation : selectorsAnnotation.value()) {
-            final String query = selectorAnnotation.value();
-
-            final Element selectedNode = getFirstOrNullOrCryIfMoreThanOne(node, false , query);
-            if (selectedNode == null) continue;
-
-            if (Instantiator.typeIsVisitable(fieldClass)) {
-                Type genericType = f.getGenericType();
-
-                if (genericType instanceof ParameterizedType) {
-                    final ParameterizedType outerType = (ParameterizedType) genericType;
-                    final Type innerType = outerType.getActualTypeArguments()[0];
-                    if (innerType instanceof ParameterizedType) {
-                        final ParameterizedType innerParamType = (ParameterizedType) innerType;
-                        final Type deepestType = innerParamType.getActualTypeArguments()[0];
-
-                        if (deepestType instanceof Class<?>) {
-                            final Class<?> clazz = (Class<?>) deepestType;
-                            f.setAccessible(true);
-                            try{
-                                f.set(newInstance, Instantiator.visitableForNode(this, selectedNode, clazz, baseUrl));
-                                return;
-                            } catch (final IllegalAccessException e) {
-                                throw new IncompatibleTypes(newInstance, selectedNode, selectorAnnotation, fieldClass, e);
-                            }
-                        }
-                    }
-                }
-                throw new RuntimeException("Could not get generic for list");
-            }
-
-            if (typeIsKnown(fieldClass)) {
-                f.setAccessible(true);
-                try{
-                    final Optional<FieldMapping> maybeFieldMapping = FieldMapping.from(f);
-                    final FieldMapping fieldMapping = maybeFieldMapping.orElseThrow();
-                    f.set(newInstance, instanceForNode(
-                            selectedNode,
-                            fieldMapping,
-                            fieldClass
-                    ));
-                } catch (final IllegalArgumentException | IllegalAccessException e){
-                    throw new IncompatibleTypes(newInstance, selectedNode, selectorAnnotation, fieldClass, e);
-                }
-                return;
-            }
-
-            throwException(fieldClass);
-        }
-
     }
 
     private static void throwException(Class<?> fieldClass) {

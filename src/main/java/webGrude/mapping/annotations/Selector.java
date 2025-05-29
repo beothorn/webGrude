@@ -62,7 +62,6 @@ import java.lang.annotation.Target;
  * @see webGrude.mapping.elements.Link
  * @see OkHttpBrowser#get(Class, String...)
  */
-@Repeatable(Selectors.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD})
 public @interface Selector {

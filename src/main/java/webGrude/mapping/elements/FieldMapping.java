@@ -1,7 +1,6 @@
 package webGrude.mapping.elements;
 
 import webGrude.mapping.annotations.Selector;
-import webGrude.mapping.annotations.Selectors;
 import webGrude.mapping.annotations.XPath;
 
 import java.lang.reflect.AnnotatedElement;
@@ -47,10 +46,6 @@ public class FieldMapping {
     }
 
     public static Optional<FieldMapping> from(AnnotatedElement annotatedElement) {
-        final Selectors selectors = annotatedElement.getAnnotation(Selectors.class);
-        if (selectors != null) {
-            return Optional.of(FieldMapping.from(selectors.value()[1]));
-        }
         final Selector selector = annotatedElement.getAnnotation(Selector.class);
         if (selector != null) {
             return Optional.of(FieldMapping.from(selector));

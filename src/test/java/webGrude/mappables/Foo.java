@@ -24,7 +24,7 @@ public class Foo {
     }
 
     @Selector("#some-nested-content") static public class SomeNestedContent {
-        @Selector("h0") @Selector("h1")   private String header;
+        @Selector("h1")  private String header;
         @Selector("span") public  String content;
         public String getHeader() {
             return header;
