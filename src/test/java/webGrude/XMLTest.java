@@ -7,7 +7,7 @@ import webGrude.mappables.Bar;
 public class XMLTest {
 
     final String barXmlContents = TestUtils.readTestResource("Bar.xml");
-    final Webgrude pageToClassMapper = new Webgrude();
+    final Webgrude pageToClassMapper = new Webgrude(true);
 
     @Test
     void simpleMapping() {

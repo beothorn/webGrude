@@ -3,7 +3,7 @@
 
 	<groupId>com.github.beothorn</groupId>
 	<artifactId>webGrude</artifactId>
-	<version>4.0.1-SNAPSHOT</version>
+	<version>5.0.0-SNAPSHOT</version>
 	<name>WebGrude</name>
 	<description>Loads the content of a html on a anottated java class.</description>
 	<url>https://github.com/beothorn/webGrude</url>

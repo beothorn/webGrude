@@ -10,7 +10,6 @@ import java.util.List;
 @Page("http://hackaday.com/blog/")
 public class Hackaday {
 
-    @Selector("article")
     static class Post {
         @Selector(".entry-title")
         String title;
@@ -27,7 +26,7 @@ public class Hackaday {
         }
     }
 
-    List<Post> posts;
+    @Selector("article") List<Post> posts;
 
     public static void main(final String[] args) {
         final Hackaday hackaday = new OkHttpBrowser().get(Hackaday.class);

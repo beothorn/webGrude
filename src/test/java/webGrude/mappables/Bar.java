@@ -16,9 +16,8 @@ public class Bar {
     @XPath("/aaa/a1")
     private String a1;
 
-    @XPath("/aaa/aNested")
     public static class NestedContent {
-        // root ensures sub xml is valid
+
         @XPath("/content")
         private String content;
 
@@ -34,7 +33,7 @@ public class Bar {
         }
     }
 
-    NestedContent content;
+    @XPath("/aaa/aNested") NestedContent content;
 
     @Override
     public String toString() {

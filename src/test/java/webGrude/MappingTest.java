@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class MappingTest {
 
     final String fooPageContents = TestUtils.readTestResource("Foo.html");
-    final Webgrude pageToClassMapper = new Webgrude();
+    final Webgrude pageToClassMapper = new Webgrude(true);
 
     @Test
     public void testMappingFromResource() {

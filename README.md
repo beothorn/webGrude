@@ -1,7 +1,7 @@
 WebGrude
 =========
 
-WebGrude is a java library for mapping a html or xml to a java class through annotations with css selectors.  
+WebGrude is a java library for mapping a html or xml to a java class through annotations.  
 
 ```java
 @Page("https://news.ycombinator.com/")
@@ -31,7 +31,7 @@ passing the url as the first parameter.
 @Page("http://localhost:{0}/{1}/bar/{2}/baz")
 public class SomePage
 // Usage
-browser.get(SomePage.class, "john", "1")
+new OkHttpBrowser().get(SomePage.class, "john", "1")
 ```
 
 You can also use regex to select a part of the scraped value to fill the field.  
@@ -61,7 +61,7 @@ Maven dependency
 <dependency>
   <groupId>com.github.beothorn</groupId>
   <artifactId>webGrude</artifactId>
-  <version>4.0.0</version>
+  <version>5.0.0</version>
 </dependency>
 ```
 
@@ -80,14 +80,12 @@ import webGrude.mapping.annotations.Selector;
 
 @Page("http://hackaday.com/blog/")
 public class Hackaday {
-    @Selector("article")
     static class Post {
-        @Selector(".entry-title")
-        String title;
-        @Selector(value = ".comments-counts", format = "([0-9]*) Comments", defValue = "0")
-        int commentsCount;//using regex to extract number
-        @Selector(value = ".entry-date a", format = "MMMM dd, yyyy - hh:mm a", attr = "title", locale = "en_US")
-        Date date;//using date format
+        @Selector(".entry-title") String title;
+        //using regex to extract number
+        @Selector(value = ".comments-counts", format = "([0-9]*) Comments", defValue = "0") int commentsCount;
+        //using date format
+        @Selector(value = ".entry-date a", format = "MMMM dd, yyyy - hh:mm a", attr = "title", locale = "en_US") Date date;
 
         @Override
         public String toString() {
@@ -95,7 +93,7 @@ public class Hackaday {
         }
     }
 
-    List<Post> posts;
+    @Selector("article") List<Post> posts;
 
     public static void main(final String[] args) {
         final Hackaday hackaday = new OkHttpBrowser().get(Hackaday.class);
@@ -130,29 +128,19 @@ public class Hackaday {
 ```
 
 ```java
-@Page(format = ParseFormat.XML)
+import webGrude.mapping.annotations.XPath;
+import webGrude.mapping.annotations.XML;
+
+@XML
 public class Bar {
-
-    @Selector(value = "/aaa/ab", useXpath = true)
-    private String ab;
-
-    @Selector(value = "/aaa/ac", useXpath = true)
-    private String ac;
-
-    @Selector(value = "/aaa/a1", useXpath = true)
-    private String a1;
-
-    @Selector(value = "/aaa/aNested", useXpath = true)
+    @XPath("/aaa/ab") private String ab;
+    @XPath("/aaa/ac") private String ac;
+    @XPath("/aaa/a1") private String a1;
     public static class NestedContent {
-        // root ensures sub xml is valid
-        @Selector(value = "/content", useXpath = true)
-        private String content;
-
-        @Selector(value = "/item", useXpath = true)
-        private List<String> items;
+        @XPath("/content") private String content;
+        @XPath("/item") private List<String> items;
     }
-
-    NestedContent content;
+    @XPath("/aaa/aNested") NestedContent content;
 }
 ```
 

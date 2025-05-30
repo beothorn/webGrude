@@ -63,7 +63,7 @@ import java.lang.annotation.Target;
  * @see OkHttpBrowser#get(Class, String...)
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD})
+@Target({ElementType.FIELD})
 public @interface Selector {
     String value();
     String attr() default "";

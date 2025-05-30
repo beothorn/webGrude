@@ -57,6 +57,15 @@ public class FieldMapping {
         return Optional.empty();
     }
 
+    public static boolean hasMappingAnnotation(AnnotatedElement annotatedElement) {
+        final Selector selector = annotatedElement.getAnnotation(Selector.class);
+        if (selector != null) {
+            return true;
+        }
+        final XPath xPath = annotatedElement.getAnnotation(XPath.class);
+        return xPath != null;
+    }
+
     public String attr() {
         return attr;
     }

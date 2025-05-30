@@ -12,18 +12,17 @@ import webGrude.mapping.elements.Link;
 
 public class Foo {
 
-    @Selector("")
     static public class SomeRepeatingContent {
         @Selector(".head") public String head;
         @Selector(".tail") public String tail;
     }
 
-    @Selector("#some-content") static public class SomeContent {
+    static public class SomeContent {
         @Selector("h1")  public String title;
         @Selector("div") public String text;
     }
 
-    @Selector("#some-nested-content") static public class SomeNestedContent {
+    static public class SomeNestedContent {
         @Selector("h1")  private String header;
         @Selector("span") public  String content;
         public String getHeader() {
@@ -31,9 +30,9 @@ public class Foo {
         }
     }
 
-    @Selector("#section") static public class Section {
+    static public class Section {
         @Selector(".some-repeating-content") public List<String> someRepeatingContent;
-        public SomeNestedContent someNestedContent;
+        @Selector("#some-nested-content") public SomeNestedContent someNestedContent;
     }
 
     @Selector(value = "#links a",     attr = "href")   public List<String> linksWithHref;
@@ -61,9 +60,9 @@ public class Foo {
 
     @Selector(value = "#date", format ="MMMM dd, yyyy - h:mm a", attr = "title", locale = "en_US") public Date date;
 
-    public SomeContent someContent;
-    public SomeNestedContent someNestedContent;
-    public Section section;
+    @Selector("#some-content")  public SomeContent someContent;
+    @Selector("#some-nested-content") public SomeNestedContent someNestedContent;
+    @Selector("#section") public Section section;
 
     public int afterLoadValue;
 
