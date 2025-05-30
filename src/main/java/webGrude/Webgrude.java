@@ -24,25 +24,45 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Core class responsible for mapping HTML or XML content to Java objects annotated with Webgrude annotations.
+ * <p>
+ * Use this to parse a page's contents and populate annotated fields with selected data.
+ */
 public class Webgrude {
 
+
+    /**
+     * Synthetic root tag used when parsing XML and HTML fragments so it always have a root.
+     */
     public static final String ROOT_FAKE = "rootFake";
+
     private final boolean debug;
 
-    public Webgrude(){
+
+    /**
+     * Creates a new Webgrude instance.
+     */
+    public Webgrude() {
         debug = false;
     }
 
-    public Webgrude(boolean debug){
+    /**
+     * Creates a new Webgrude instance.
+     *
+     * @param debug whether to enable debug logging
+     */
+    public Webgrude(boolean debug) {
         this.debug = debug;
     }
 
-    /***
-     * Maps a Html string to a class with {@literal @}Selector annotations
-     * @param pageContents
-     * @param pageClass
-     * @return the page instance
-     * @param <T> The page class
+    /**
+     * Maps an HTML string to a class with {@literal @}Selector annotations.
+     *
+     * @param pageContents the HTML content to be parsed
+     * @param pageClass    the class with annotated fields to populate
+     * @param <T>          the type of the page class
+     * @return an instance of the page class populated with data from the HTML
      */
     public <T> T map(
             final String pageContents,
@@ -52,13 +72,14 @@ public class Webgrude {
         return map(pageContents, pageClass, url);
     }
 
-    /***
-     * Maps a Html string to a class with {@literal @}Selector annotations
-     * @param pageContents
-     * @param pageClass
-     * @param baseUrl Used to populate links with the full href
-     * @return the page instance
-     * @param <T> The page class
+    /**
+     * Maps an HTML string to a class with {@literal @}Selector annotations.
+     *
+     * @param pageContents the HTML content to be parsed
+     * @param pageClass    the class with annotated fields to populate
+     * @param baseUrl      base URL used to resolve relative links
+     * @param <T>          the type of the page class
+     * @return an instance of the page class populated with data from the HTML
      */
     public <T> T map(
         final String pageContents,
@@ -405,6 +426,12 @@ public class Webgrude {
         return URLEncoder.encode(p, StandardCharsets.UTF_8);
     }
 
+    /**
+     * Checks whether the provided class is a type natively supported by Webgrude (String, Integer, Float, etc.).
+     *
+     * @param c the class to check
+     * @return true if the class is known and directly mappable, false otherwise
+     */
     public boolean typeIsKnown(final Class c) {
         return c.equals(String.class) ||
                 c.equals(Integer.class) || c.getSimpleName().equals("int") ||

@@ -3,59 +3,29 @@ package webGrude.mapping.annotations;
 import webGrude.OkHttpBrowser;
 
 import java.lang.annotation.ElementType;
-import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotates a field to be mapped using a css selector.
+ * Annotates a field to be mapped using a CSS selector.
  * <p>
- * A field annotated with this will receive the value corresponding to it's css
+ * A field annotated with this will receive the value corresponding to its CSS
  * selector when mapped.
- * The field can be any of the following types (or its primitive):
+ * The field can be one of the following types (or its primitive counterpart):
  * <ul>
- * <li>String</li>
- * <li>Float</li>
- * <li>Integer</li>
- * <li>Boolean</li>
- * <li>webGrude.mapping.elements.Link</li>
- * <li>org.jsoup.nodes.Element</li>
+ *   <li>String</li>
+ *   <li>Float</li>
+ *   <li>Integer</li>
+ *   <li>Boolean</li>
+ *   <li>{@code webGrude.mapping.elements.Link}</li>
+ *   <li>{@code org.jsoup.nodes.Element}</li>
  * </ul>
- * Or a List of any of these types.<br>
- * You can also set the field as an attribute value instead of it's text using
- * the attr annotation value. html and outerHtml are also valid values for attr.
- * For example:
+ * Or a {@code List} of any of these types.
  * <p>
- * A field mapping a link with id foo
- * </p>
- * <pre>
- * {@code @Selector("#foo") String fooText;}
- * </pre>
- * <p>
- * A field mapping a link with id foo but receiving the href value
- * </p>
- * <pre>
- * {@code @Selector(value = "#foo", attr="href") String fooText;}
- * </pre>
- * <p>
- * A field mapping a link with id foo but receiving the href value
- * </p>
- * <pre>
- * {@code @Selector(value = "#foo", attr="href") String fooText;}
- * </pre>
- * <p>
- * A field mapping a the inner html code of a link with id foo
- * </p>
- * <pre>
- * {@code @Selector(value = "#foo", attr="html") String fooHtml;}
- * </pre>
- * <p>
- * A field mapping a the outer html code of a link with id foo
- * </p>
- * <pre>
- * {@code @Selector(value = "#foo", attr="outerHtml") String fooOuterHtml;}
- * </pre>
+ * You can also extract an attribute's value instead of the element's text using
+ * the {@code attr} attribute. Special values for {@code attr} include:
+ * {@code "html"} (inner HTML) and {@code "outerHtml"} (entire HTML of the element).
  *
  * @author beothorn
  * @see webGrude.mapping.annotations.Page
@@ -65,9 +35,42 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
 public @interface Selector {
+
+    /**
+     * The CSS selector used to locate the element(s).
+     *
+     * @return the CSS selector string
+     */
     String value();
+
+    /**
+     * The attribute to extract from the selected element.
+     * If empty, the text content is used.
+     * Special values include "html" and "outerHtml".
+     *
+     * @return the attribute name or empty for text content
+     */
     String attr() default "";
+
+    /**
+     * A formatting pattern (e.g., for dates or numbers) to apply when mapping the value.
+     *
+     * @return the format string
+     */
     String format() default "";
+
+    /**
+     * The locale to use for formatting and parsing.
+     * Should be in the form of a language tag, e.g., "en-US".
+     *
+     * @return the locale string
+     */
     String locale() default "";
+
+    /**
+     * The default value to assign to the field if the selector does not match anything.
+     *
+     * @return the default value
+     */
     String defValue() default "";
 }

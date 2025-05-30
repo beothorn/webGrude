@@ -48,6 +48,13 @@ public class OkHttpBrowser implements LinkVisitor {
     private final Webgrude webgrude = new Webgrude();
 
     /**
+     * Creates a new instance of OkHttpBrowser using the default Webgrude and OkHttpClient.
+     */
+    public OkHttpBrowser() {
+        // Default constructor
+    }
+
+    /**
      * Loads content from url from the Page annotation on pageClass onto an instance of pageClass.
      *
      * @param <T>       An instance of the class with {@literal @}Selector annotation
