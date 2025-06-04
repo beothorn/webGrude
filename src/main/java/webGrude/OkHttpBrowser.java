@@ -99,7 +99,7 @@ public class OkHttpBrowser implements LinkVisitor {
      */
     public <T> T execute(Request request, final Class<T> pageClass) throws IOException {
         try (Response response = client().newCall(request).execute()) {
-            if (response.isSuccessful()) {
+            if (!response.isSuccessful()) {
                 throw new IOException("Unsuccessful response " + response.code());
             }
             if (response.body() == null) {
