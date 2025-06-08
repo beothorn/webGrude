@@ -3,6 +3,7 @@ package webGrude;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
+import okhttp3.Request;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,5 +50,17 @@ public class BrowserTest {
 
         assertEquals("GET", recordedRequest.getMethod());
         assertEquals("/x/bar/y/baz", recordedRequest.getPath());
+    }
+
+    @Test
+    public void testExecute() throws IOException {
+        String url = mockWebServer.url("/foo").toString();
+        okhttp3.Request request = new okhttp3.Request.Builder()
+                .url(url)
+                .build();
+
+        Foo foo = okHttpBrowser.execute(request, Foo.class);
+
+        assertEquals("Title", foo.someContent.title);
     }
 }
