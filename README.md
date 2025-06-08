@@ -28,7 +28,7 @@ You can write the url from where the values should be loaded from on a @Page ann
 passing the url as the first parameter.  
 @Page can also have an url template and parameters.
 ```java
-@Page("http://localhost:{0}/{1}/bar/{2}/baz")
+@Page("http://localhost/{0}/bar/{1}/baz")
 public class SomePage
 // Usage
 new OkHttpBrowser().get(SomePage.class, "john", "1")

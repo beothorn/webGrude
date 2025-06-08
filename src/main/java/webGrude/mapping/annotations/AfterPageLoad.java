@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * <p>
  * When the webgrude Browser finishes loading the values from the Html to the Page class fields this
  * method is called. If there is any values that need to be post processed this should be possible
- * by anottating a method with this annotation.
+ * by annotating a method with this annotation.
  *
  * @author beothorn
  * @see OkHttpBrowser#get(Class, String...)
